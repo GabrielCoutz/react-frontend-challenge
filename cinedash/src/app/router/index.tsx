@@ -5,11 +5,20 @@ import {
   Outlet,
   redirect,
 } from "@tanstack/react-router";
+import { z } from "zod";
 import { useAuthStore } from "@/entities/user/model/auth-store";
 import { LoginPage } from "@/pages/login/ui/login-page";
 import { DiscoveryPage } from "@/pages/discovery/ui/discovery-page";
 import { MovieDetailsPage } from "@/pages/movie-details/ui/movie-details-page";
 import { WatchlistPage } from "@/pages/watchlist/ui/watchlist-page";
+
+const discoverySearchSchema = z.object({
+  query: z.string().optional(),
+  genreId: z.string().optional(),
+  year: z.number().optional(),
+  minRating: z.number().optional(),
+  page: z.number().optional().default(1),
+});
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -41,6 +50,7 @@ const authenticatedRoute = createRoute({
 const discoveryRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/discovery",
+  validateSearch: discoverySearchSchema,
   component: DiscoveryPage,
 });
 

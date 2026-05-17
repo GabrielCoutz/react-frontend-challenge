@@ -5,10 +5,11 @@ import { useDebounce } from '@/shared/hooks/use-debounce'
 
 interface SearchInputProps {
   onSearch: (query: string) => void
+  initialValue?: string
 }
 
-export function SearchInput({ onSearch }: SearchInputProps) {
-  const [value, setValue] = useState('')
+export function SearchInput({ onSearch, initialValue = '' }: SearchInputProps) {
+  const [value, setValue] = useState(initialValue)
   const debounced = useDebounce(value, 400)
 
   useEffect(() => {
