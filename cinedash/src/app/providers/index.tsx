@@ -1,19 +1,19 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Toaster } from '@/components/ui/sonner'
-import type { ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "@/components/ui/sonner";
+import type { ReactNode } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
+      staleTime: 5 * 60 * 1000, // 5 minutes
       retry: 1,
     },
   },
-})
+});
 
 interface ProvidersProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export function Providers({ children }: ProvidersProps) {
@@ -23,5 +23,5 @@ export function Providers({ children }: ProvidersProps) {
       <Toaster richColors position="top-right" />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
-  )
+  );
 }

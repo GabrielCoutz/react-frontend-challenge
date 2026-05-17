@@ -1,61 +1,74 @@
-import { createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router'
-import { LoginPage } from '@/pages/login/ui/login-page'
-import { DiscoveryPage } from '@/pages/discovery/ui/discovery-page'
-import { MovieDetailsPage } from '@/pages/movie-details/ui/movie-details-page'
-import { WatchlistPage } from '@/pages/watchlist/ui/watchlist-page'
-
-// TODO: [TanStack Router] Importar useAuthStore e implementar beforeLoad nas rotas protegidas
-// Exemplo de auth guard:
-//
-// import { useAuthStore } from '@/entities/user/model/auth-store'
-//
-// beforeLoad: ({ context }) => {
-//   const isAuth = useAuthStore.getState().isAuth
-//   if (!isAuth) throw redirect({ to: '/' })
-// }
-//
-// Referência: https://tanstack.com/router/latest/docs/framework/react/guide/authenticated-routes
+import {
+  createRouter,
+  createRootRoute,
+  createRoute,
+  Outlet,
+  redirect,
+} from "@tanstack/react-router";
+import { useAuthStore } from "@/entities/user/model/auth-store";
+import { LoginPage } from "@/pages/login/ui/login-page";
+import { DiscoveryPage } from "@/pages/discovery/ui/discovery-page";
+import { MovieDetailsPage } from "@/pages/movie-details/ui/movie-details-page";
+import { WatchlistPage } from "@/pages/watchlist/ui/watchlist-page";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
-})
+});
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
-  component: LoginPage,
-})
+  path: "/",
+  beforeLoad: () => {
+    const { isAuthenticated } = useAuthStore.getState();
 
-// TODO: [TanStack Router] adicionar beforeLoad com auth guard nas rotas abaixo
-const discoveryRoute = createRoute({
+    if (isAuthenticated) throw redirect({ to: "/discovery" });
+  },
+  component: LoginPage,
+});
+
+// Layout route sem segmento de path — agrupa todas as rotas protegidas
+// O prefixo _ garante que não vira uma rota acessível diretamente
+const authenticatedRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/discovery',
+  id: "_authenticated",
+  beforeLoad: () => {
+    const { isAuthenticated } = useAuthStore.getState();
+    if (!isAuthenticated) throw redirect({ to: "/" });
+  },
+  component: () => <Outlet />,
+});
+
+const discoveryRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/discovery",
   component: DiscoveryPage,
-})
+});
 
 const movieDetailsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/movie/$id',
+  getParentRoute: () => authenticatedRoute,
+  path: "/movie/$id",
   component: MovieDetailsPage,
-})
+});
 
 const watchlistRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/watchlist',
+  getParentRoute: () => authenticatedRoute,
+  path: "/watchlist",
   component: WatchlistPage,
-})
+});
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
-  discoveryRoute,
-  movieDetailsRoute,
-  watchlistRoute,
-])
+  authenticatedRoute.addChildren([
+    discoveryRoute,
+    movieDetailsRoute,
+    watchlistRoute,
+  ]),
+]);
 
-export const router = createRouter({ routeTree })
+export const router = createRouter({ routeTree });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
-    router: typeof router
+    router: typeof router;
   }
 }

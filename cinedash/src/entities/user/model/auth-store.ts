@@ -1,26 +1,37 @@
-import { create } from 'zustand'
-
-// TODO: [Zustand] adicionar persist middleware para salvar token em localStorage
-// Exemplo: import { persist } from 'zustand/middleware'
-// Envolver o create com: create(persist(..., { name: 'auth-storage' }))
+import { generateAuthToken } from "@/shared/utils/generateAuthToken";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface AuthState {
-  token: string | null
-  isAuth: boolean
-  login: (email: string, password: string) => void
-  logout: () => void
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>()((set) => ({
-  token: null,
-  isAuth: false,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      token: null,
+      isAuthenticated: false,
 
-  login: (email: string, _password: string) => {
-    const fakeToken = btoa(`${email}:${Date.now()}`)
-    set({ token: fakeToken, isAuth: true })
-  },
+      async login() {
+        await new Promise((r) => setTimeout(r, 2000)); // intentional 2s delay to simulate network request
 
-  logout: () => {
-    set({ token: null, isAuth: false })
-  },
-}))
+        const authToken = generateAuthToken();
+
+        set({ token: authToken, isAuthenticated: true });
+
+        return true;
+      },
+
+      logout: () => {
+        set({ token: null, isAuthenticated: false });
+      },
+    }),
+    {
+      name: "auth-storage",
+      partialize: (state) => ({ token: state.token, isAuthenticated: state.isAuthenticated }),
+    },
+  ),
+);
