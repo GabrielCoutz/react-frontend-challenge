@@ -1,33 +1,32 @@
-import { useParams, useNavigate, Link } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { ArrowLeft, Star, Plus, Check } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useMovie } from '@/entities/movie/api/use-movie'
-import { useCredits } from '@/entities/movie/api/use-credits'
-import { useVideos } from '@/entities/movie/api/use-videos'
-import { useWatchlistStore } from '@/features/watchlist/model/watchlist-store'
-import { getImageUrl } from '@/shared/api/tmdb-client'
-import { Image } from '@/shared/ui/image'
+import { useParams, Link } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { ArrowLeft, Star, Plus, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMovie } from "@/entities/movie/api/use-movie";
+import { useCredits } from "@/entities/movie/api/use-credits";
+import { useVideos } from "@/entities/movie/api/use-videos";
+import { useWatchlistStore } from "@/features/watchlist/model/watchlist-store";
+import { getImageUrl } from "@/shared/api/tmdb-client";
+import { Image } from "@/shared/ui/image";
 
 export function MovieDetailsPage() {
-  const { id } = useParams({ from: '/_authenticated/movie/$id' })
-  const movieId = Number(id)
+  const { id } = useParams({ from: "/_authenticated/movie/$id" });
+  const movieId = Number(id);
 
+  const { data: movie, isLoading: loadingMovie } = useMovie(movieId);
+  const { data: credits, isLoading: loadingCredits } = useCredits(movieId);
+  const { data: trailers = [], isLoading: loadingVideos } = useVideos(movieId);
 
-  const { data: movie, isLoading: loadingMovie } = useMovie(movieId)
-  const { data: credits, isLoading: loadingCredits } = useCredits(movieId)
-  const { data: trailers = [], isLoading: loadingVideos } = useVideos(movieId)
-
-  const { add, remove, isInWatchlist } = useWatchlistStore()
-  const inWatchlist = movie ? isInWatchlist(movie.id) : false
+  const { add, remove, isInWatchlist } = useWatchlistStore();
+  const inWatchlist = movie ? isInWatchlist(movie.id) : false;
 
   const handleWatchlistToggle = () => {
-    if (!movie) return
+    if (!movie) return;
     if (inWatchlist) {
-      remove(movie.id)
-      toast.success(`"${movie.title}" removido da lista`)
+      remove(movie.id);
+      toast.success(`"${movie.title}" removido da lista`);
     } else {
       add({
         id: movie.id,
@@ -35,29 +34,34 @@ export function MovieDetailsPage() {
         genre_ids: movie.genre_ids,
         release_date: movie.release_date,
         vote_average: movie.vote_average,
-      })
-      toast.success(`"${movie.title}" adicionado à lista`)
+      });
+      toast.success(`"${movie.title}" adicionado à lista`);
     }
-  }
+  };
 
-  const isLoading = loadingMovie || loadingCredits || loadingVideos
-  const topCast = credits?.cast.slice(0, 5) ?? []
-  const trailer = trailers[0]
-  const posterUrl = getImageUrl(movie?.poster_path ?? null, 'w500')
-  const backdropUrl = getImageUrl(movie?.backdrop_path ?? null, 'original')
+  const isLoading = loadingMovie || loadingCredits || loadingVideos;
+  const topCast = credits?.cast.slice(0, 5) ?? [];
+  const trailer = trailers[0];
+  const posterUrl = getImageUrl(movie?.poster_path ?? null, "w500");
+  const backdropUrl = getImageUrl(movie?.backdrop_path ?? null, "original");
 
-  if (isLoading) return <MovieDetailsSkeleton />
+  if (isLoading) return <MovieDetailsSkeleton />;
 
-  if (!movie) return (
-    <div className="container mx-auto p-6 text-center text-muted-foreground py-20">
-      Filme não encontrado.
-    </div>
-  )
+  if (!movie)
+    return (
+      <div className="container mx-auto p-6 text-center text-muted-foreground py-20">
+        Filme não encontrado.
+      </div>
+    );
 
   return (
     <div>
       <div className="relative h-64 md:h-80 overflow-hidden bg-muted">
-        <Image src={backdropUrl} alt="" className="w-full h-full object-cover" />
+        <Image
+          src={backdropUrl}
+          alt=""
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
       </div>
 
@@ -68,7 +72,11 @@ export function MovieDetailsPage() {
 
         <div className="flex flex-col md:flex-row gap-8">
           <div className="relative w-48 shrink-0 self-start rounded-lg overflow-hidden shadow-lg aspect-[2/3]">
-            <Image src={posterUrl} alt={movie.title} className="w-full h-full object-cover" />
+            <Image
+              src={posterUrl}
+              alt={movie.title}
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <div className="space-y-4 flex-1">
@@ -79,24 +87,46 @@ export function MovieDetailsPage() {
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   {movie.vote_average.toFixed(1)}
                 </span>
-                {movie.release_date && <span>{movie.release_date.slice(0, 4)}</span>}
+                {movie.release_date && (
+                  <span>{movie.release_date.slice(0, 4)}</span>
+                )}
               </div>
               {movie.genres && (
                 <div className="flex flex-wrap gap-2">
                   {movie.genres.map((g) => (
-                    <Badge key={g.id} variant="secondary">{g.name}</Badge>
+                    <Link
+                      key={g.id}
+                      to="/discovery"
+                      search={{ genreIds: [String(g.id)], page: 1 }}
+                    >
+                      <Badge
+                        variant="secondary"
+                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                      >
+                        {g.name}
+                      </Badge>
+                    </Link>
                   ))}
                 </div>
               )}
             </div>
 
-            <p className="text-muted-foreground leading-relaxed">{movie.overview}</p>
+            <p className="text-muted-foreground leading-relaxed">
+              {movie.overview}
+            </p>
 
-            <Button onClick={handleWatchlistToggle} variant={inWatchlist ? 'secondary' : 'default'}>
+            <Button
+              onClick={handleWatchlistToggle}
+              variant={inWatchlist ? "secondary" : "default"}
+            >
               {inWatchlist ? (
-                <><Check className="h-4 w-4 mr-2" /> Na lista</>
+                <>
+                  <Check className="h-4 w-4 mr-2" /> Na lista
+                </>
               ) : (
-                <><Plus className="h-4 w-4 mr-2" /> Adicionar à lista</>
+                <>
+                  <Plus className="h-4 w-4 mr-2" /> Adicionar à lista
+                </>
               )}
             </Button>
           </div>
@@ -105,24 +135,39 @@ export function MovieDetailsPage() {
         {topCast.length > 0 && (
           <section className="space-y-3">
             <h2 className="text-xl font-semibold">Elenco</h2>
-            <div className="flex gap-4 overflow-x-auto pb-2">
+            <div className="flex gap-4 overflow-x-auto pb-2 pl-1 pt-1">
               {topCast.map((actor) => {
-                const photo = getImageUrl(actor.profile_path, 'w185')
+                const photo = getImageUrl(actor.profile_path, "w185");
                 return (
                   <Link
                     key={actor.id}
                     to="/discovery"
-                    search={{ personId: actor.id, personName: actor.name, page: 1 }}
-                    className="shrink-0 w-24 text-center space-y-1 group/actor"
+                    search={{
+                      personId: actor.id,
+                      personName: actor.name,
+                      page: 1,
+                    }}
+                    className="shrink-0 w-24 text-center space-y-1 group/actor rounded-full"
                     title={`Ver filmes de ${actor.name}`}
                   >
-                    <div className="relative w-24 h-24 rounded-full overflow-hidden bg-muted mx-auto ring-2 ring-transparent group-hover/actor:ring-primary transition-all">
-                      <Image src={photo} alt={actor.name} className="w-full h-full object-cover" />
+                    <div className="relative w-24 h-24 mx-auto">
+                      <div className="absolute inset-0 rounded-full ring-2 ring-transparent group-hover/actor:ring-primary transition-all z-10 pointer-events-none" />
+                      <div className="w-full h-full rounded-full overflow-hidden bg-muted">
+                        <Image
+                          src={photo}
+                          alt={actor.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     </div>
-                    <p className="text-xs font-medium line-clamp-2 group-hover/actor:text-primary transition-colors">{actor.name}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">{actor.character}</p>
+                    <p className="text-xs font-medium line-clamp-2 group-hover/actor:text-primary transition-colors">
+                      {actor.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                      {actor.character}
+                    </p>
                   </Link>
-                )
+                );
               })}
             </div>
           </section>
@@ -144,7 +189,7 @@ export function MovieDetailsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function MovieDetailsSkeleton() {
@@ -161,5 +206,5 @@ function MovieDetailsSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
