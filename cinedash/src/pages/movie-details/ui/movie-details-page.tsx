@@ -56,53 +56,38 @@ export function MovieDetailsPage() {
 
   return (
     <div>
-      <div className="relative h-64 md:h-80 overflow-hidden bg-muted">
-        <Image
-          src={backdropUrl}
-          alt=""
-          className="w-full h-full object-cover"
-        />
+      {/* Backdrop */}
+      <div className="relative h-48 sm:h-64 md:h-80 overflow-hidden bg-muted">
+        <Image src={backdropUrl} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
       </div>
 
-      <div className="container mx-auto p-6 space-y-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 space-y-6 sm:space-y-8">
         <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
         </Button>
 
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="relative w-48 shrink-0 self-start rounded-lg overflow-hidden shadow-lg aspect-[2/3]">
-            <Image
-              src={posterUrl}
-              alt={movie.title}
-              className="w-full h-full object-cover"
-            />
+        {/* Poster + Info */}
+        <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
+          <div className="relative w-32 sm:w-48 shrink-0 self-start rounded-lg overflow-hidden shadow-lg aspect-[2/3]">
+            <Image src={posterUrl} alt={movie.title} className="w-full h-full object-cover" />
           </div>
 
-          <div className="space-y-4 flex-1">
+          <div className="space-y-4 flex-1 min-w-0">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">{movie.title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold leading-tight">{movie.title}</h1>
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   {movie.vote_average.toFixed(1)}
                 </span>
-                {movie.release_date && (
-                  <span>{movie.release_date.slice(0, 4)}</span>
-                )}
+                {movie.release_date && <span>{movie.release_date.slice(0, 4)}</span>}
               </div>
               {movie.genres && (
                 <div className="flex flex-wrap gap-2">
                   {movie.genres.map((g) => (
-                    <Link
-                      key={g.id}
-                      to="/discovery"
-                      search={{ genreIds: [String(g.id)], page: 1 }}
-                    >
-                      <Badge
-                        variant="secondary"
-                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                      >
+                    <Link key={g.id} to="/discovery" search={{ genreIds: [String(g.id)], page: 1 }}>
+                      <Badge variant="secondary" className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
                         {g.name}
                       </Badge>
                     </Link>
@@ -111,53 +96,39 @@ export function MovieDetailsPage() {
               )}
             </div>
 
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               {movie.overview}
             </p>
 
-            <Button
-              onClick={handleWatchlistToggle}
-              variant={inWatchlist ? "secondary" : "default"}
-            >
+            <Button onClick={handleWatchlistToggle} variant={inWatchlist ? "secondary" : "default"}>
               {inWatchlist ? (
-                <>
-                  <Check className="h-4 w-4 mr-2" /> Na lista
-                </>
+                <><Check className="h-4 w-4 mr-2" /> Na lista</>
               ) : (
-                <>
-                  <Plus className="h-4 w-4 mr-2" /> Adicionar à lista
-                </>
+                <><Plus className="h-4 w-4 mr-2" /> Adicionar à lista</>
               )}
             </Button>
           </div>
         </div>
 
+        {/* Elenco */}
         {topCast.length > 0 && (
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold">Elenco</h2>
-            <div className="flex gap-4 overflow-x-auto pb-2 pl-1 pt-1">
+            <h2 className="text-lg sm:text-xl font-semibold">Elenco</h2>
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 pl-1 pt-1">
               {topCast.map((actor) => {
                 const photo = getImageUrl(actor.profile_path, "w185");
                 return (
                   <Link
                     key={actor.id}
                     to="/discovery"
-                    search={{
-                      personId: actor.id,
-                      personName: actor.name,
-                      page: 1,
-                    }}
-                    className="shrink-0 w-24 text-center space-y-1 group/actor rounded-full"
+                    search={{ personId: actor.id, personName: actor.name, page: 1 }}
+                    className="shrink-0 w-20 sm:w-24 text-center space-y-1 group/actor"
                     title={`Ver filmes de ${actor.name}`}
                   >
-                    <div className="relative w-24 h-24 mx-auto">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto">
                       <div className="absolute inset-0 rounded-full ring-2 ring-transparent group-hover/actor:ring-primary transition-all z-10 pointer-events-none" />
                       <div className="w-full h-full rounded-full overflow-hidden bg-muted">
-                        <Image
-                          src={photo}
-                          alt={actor.name}
-                          className="w-full h-full object-cover"
-                        />
+                        <Image src={photo} alt={actor.name} className="w-full h-full object-cover" />
                       </div>
                     </div>
                     <p className="text-xs font-medium line-clamp-2 group-hover/actor:text-primary transition-colors">
@@ -173,9 +144,10 @@ export function MovieDetailsPage() {
           </section>
         )}
 
+        {/* Trailer */}
         {trailer && (
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold">Trailer</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">Trailer</h2>
             <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden">
               <iframe
                 src={`https://www.youtube.com/embed/${trailer.key}`}
@@ -194,15 +166,40 @@ export function MovieDetailsPage() {
 
 function MovieDetailsSkeleton() {
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <Skeleton className="h-8 w-24" />
-      <div className="flex gap-8">
-        <Skeleton className="w-48 h-72 rounded-lg shrink-0" />
-        <div className="space-y-3 flex-1">
-          <Skeleton className="h-8 w-3/4" />
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-10 w-40" />
+    <div>
+      {/* Backdrop skeleton */}
+      <Skeleton className="h-48 sm:h-64 md:h-80 w-full rounded-none" />
+
+      <div className="container mx-auto px-4 sm:px-6 py-6 space-y-6 sm:space-y-8">
+        <Skeleton className="h-8 w-20" />
+
+        {/* Poster + info skeleton */}
+        <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
+          <Skeleton className="w-32 sm:w-48 aspect-[2/3] rounded-lg shrink-0" />
+          <div className="space-y-3 flex-1">
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-28" />
+            <div className="flex gap-2">
+              <Skeleton className="h-6 w-16 rounded-full" />
+              <Skeleton className="h-6 w-20 rounded-full" />
+            </div>
+            <Skeleton className="h-20 sm:h-24 w-full" />
+            <Skeleton className="h-9 w-40" />
+          </div>
+        </div>
+
+        {/* Elenco skeleton */}
+        <div className="space-y-3">
+          <Skeleton className="h-6 w-24" />
+          <div className="flex gap-3 sm:gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="shrink-0 w-20 sm:w-24 space-y-2 text-center">
+                <Skeleton className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mx-auto" />
+                <Skeleton className="h-3 w-16 mx-auto" />
+                <Skeleton className="h-3 w-12 mx-auto" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
