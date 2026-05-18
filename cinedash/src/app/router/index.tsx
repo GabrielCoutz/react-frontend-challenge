@@ -15,7 +15,7 @@ import { WatchlistPage } from "@/pages/watchlist/ui/watchlist-page";
 
 const discoverySearchSchema = z.object({
   query: z.string().optional(),
-  genreId: z.string().optional(),
+  genreIds: z.array(z.string()).optional(),
   year: z.number().optional(),
   minRating: z.number().optional(),
   page: z.number().optional().default(1),

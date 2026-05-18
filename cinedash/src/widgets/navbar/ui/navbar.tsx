@@ -1,9 +1,11 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Film, List, LogOut } from "lucide-react";
 import { useAuthStore } from "@/entities/user/model/auth-store";
+import { useWatchlistStore } from "@/features/watchlist/model/watchlist-store";
 
 export function Navbar() {
   const logout = useAuthStore((s) => s.logout);
+  const watchlistCount = useWatchlistStore((s) => s.movies.length);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -41,6 +43,11 @@ export function Navbar() {
         >
           <List className="h-4 w-4" />
           Watchlist
+          {watchlistCount > 0 && (
+            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-bold text-primary-foreground">
+              {watchlistCount}
+            </span>
+          )}
         </Link>
       </nav>
 

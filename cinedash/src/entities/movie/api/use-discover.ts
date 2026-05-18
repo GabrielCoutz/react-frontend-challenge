@@ -3,21 +3,23 @@ import { tmdbApi } from '@/shared/api/tmdb-api'
 
 interface DiscoverParams {
   page?: number
-  genreId?: string
+  genreIds?: string[]
   year?: number
   minRating?: number
 }
 
-export function useDiscover({ page = 1, genreId, year, minRating }: DiscoverParams) {
+export function useDiscover({ page = 1, genreIds, year, minRating }: DiscoverParams) {
+  const withGenres = genreIds && genreIds.length > 0 ? genreIds.join(',') : undefined
+
   return useQuery({
-    queryKey: ['movies', 'discover', { page, genreId, year, minRating }],
+    queryKey: ['movies', 'discover', { page, genreIds, year, minRating }],
     queryFn: () =>
       tmdbApi.discoverMovies({
         page,
-        with_genres: genreId,
+        with_genres: withGenres,
         primary_release_year: year,
         'vote_average.gte': minRating,
       }),
-    enabled: !!(genreId || year || minRating),
+    enabled: !!(withGenres || year || minRating),
   })
 }
