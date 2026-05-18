@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { z } from "zod";
 import { useAuthStore } from "@/entities/user/model/auth-store";
+import { AuthenticatedLayout } from "@/app/layouts/authenticated-layout";
 import { LoginPage } from "@/pages/login/ui/login-page";
 import { DiscoveryPage } from "@/pages/discovery/ui/discovery-page";
 import { MovieDetailsPage } from "@/pages/movie-details/ui/movie-details-page";
@@ -44,7 +45,7 @@ const authenticatedRoute = createRoute({
     const { isAuthenticated } = useAuthStore.getState();
     if (!isAuthenticated) throw redirect({ to: "/" });
   },
-  component: () => <Outlet />,
+  component: AuthenticatedLayout,
 });
 
 const discoveryRoute = createRoute({

@@ -16,24 +16,25 @@ export interface MovieFilters {
 interface FilterBarProps {
   filters: MovieFilters;
   onChange: (filters: MovieFilters) => void;
+  sidebar?: boolean;
 }
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
 const RATINGS = [6, 7, 7.5, 8, 8.5, 9];
 
-export function FilterBar({ filters, onChange }: FilterBarProps) {
+export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps) {
   const { data: genres = [] } = useGenres();
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className={sidebar ? 'flex flex-col gap-2' : 'flex flex-wrap gap-3'}>
       <Select
         value={filters.genreId}
         onValueChange={(v) =>
           onChange({ ...filters, genreId: v === "all" || !v ? "" : v })
         }
       >
-        <SelectTrigger className="w-40">
+        <SelectTrigger className={sidebar ? 'w-full' : 'w-40'}>
           <SelectValue placeholder="Gênero" />
         </SelectTrigger>
         <SelectContent>
@@ -55,7 +56,7 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
           })
         }
       >
-        <SelectTrigger className="w-36">
+        <SelectTrigger className={sidebar ? 'w-full' : 'w-36'}>
           <SelectValue placeholder="Ano" />
         </SelectTrigger>
         <SelectContent>
@@ -77,7 +78,7 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
           })
         }
       >
-        <SelectTrigger className="w-40">
+        <SelectTrigger className={sidebar ? 'w-full' : 'w-40'}>
           <SelectValue placeholder="Nota mínima" />
         </SelectTrigger>
         <SelectContent>
