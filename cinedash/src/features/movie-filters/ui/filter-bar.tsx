@@ -4,32 +4,34 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useGenres } from '@/entities/movie/api/use-genres'
+} from "@/components/ui/select";
+import { useGenres } from "@/entities/movie/api/use-genres";
 
 export interface MovieFilters {
-  genreId: string
-  year: number | undefined
-  minRating: number | undefined
+  genreId: string;
+  year: number | undefined;
+  minRating: number | undefined;
 }
 
 interface FilterBarProps {
-  filters: MovieFilters
-  onChange: (filters: MovieFilters) => void
+  filters: MovieFilters;
+  onChange: (filters: MovieFilters) => void;
 }
 
-const CURRENT_YEAR = new Date().getFullYear()
-const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i)
-const RATINGS = [6, 7, 7.5, 8, 8.5, 9]
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
+const RATINGS = [6, 7, 7.5, 8, 8.5, 9];
 
 export function FilterBar({ filters, onChange }: FilterBarProps) {
-  const { data: genres = [] } = useGenres()
+  const { data: genres = [] } = useGenres();
 
   return (
     <div className="flex flex-wrap gap-3">
       <Select
         value={filters.genreId}
-        onValueChange={(v) => onChange({ ...filters, genreId: v === 'all' ? '' : v })}
+        onValueChange={(v) =>
+          onChange({ ...filters, genreId: v === "all" || !v ? "" : v })
+        }
       >
         <SelectTrigger className="w-40">
           <SelectValue placeholder="Gênero" />
@@ -45,8 +47,13 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
       </Select>
 
       <Select
-        value={filters.year ? String(filters.year) : 'all'}
-        onValueChange={(v) => onChange({ ...filters, year: v === 'all' ? undefined : Number(v) })}
+        value={filters.year ? String(filters.year) : "all"}
+        onValueChange={(v) =>
+          onChange({
+            ...filters,
+            year: v === "all" || !v ? undefined : Number(v),
+          })
+        }
       >
         <SelectTrigger className="w-36">
           <SelectValue placeholder="Ano" />
@@ -62,9 +69,12 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
       </Select>
 
       <Select
-        value={filters.minRating ? String(filters.minRating) : 'all'}
+        value={filters.minRating ? String(filters.minRating) : "all"}
         onValueChange={(v) =>
-          onChange({ ...filters, minRating: v === 'all' ? undefined : Number(v) })
+          onChange({
+            ...filters,
+            minRating: v === "all" || !v ? undefined : Number(v),
+          })
         }
       >
         <SelectTrigger className="w-40">
@@ -80,5 +90,5 @@ export function FilterBar({ filters, onChange }: FilterBarProps) {
         </SelectContent>
       </Select>
     </div>
-  )
+  );
 }
