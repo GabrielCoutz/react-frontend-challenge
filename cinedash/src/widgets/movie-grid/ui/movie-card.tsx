@@ -18,7 +18,11 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
   const { add, remove, isInWatchlist } = useWatchlistStore()
   const inWatchlist = isInWatchlist(movie.id)
 
-  const posterUrl = getImageUrl(movie.poster_path, 'w342')
+  // Backdrop (16/9 nativo) com fallback para poster
+  const imageUrl = movie.backdrop_path
+    ? getImageUrl(movie.backdrop_path, 'w780')
+    : getImageUrl(movie.poster_path, 'w500')
+
   const year = movie.release_date?.slice(0, 4)
   const movieGenres = genres.filter((g) => movie.genre_ids.includes(g.id)).slice(0, 2)
 
@@ -42,10 +46,10 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
 
   return (
     <Link to="/movie/$id" params={{ id: String(movie.id) }}>
-      <Card className="group overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer h-full">
-        <div className="aspect-[2/3] relative bg-muted">
+      <Card className="group overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer flex flex-col h-full">
+        <div className="aspect-video relative bg-muted">
           <Image
-            src={posterUrl}
+            src={imageUrl}
             alt={movie.title}
             className="w-full h-full object-cover"
           />
@@ -61,24 +65,25 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
           >
             {inWatchlist ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
           </button>
+
+          <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+
+          <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span className="text-xs font-semibold text-white drop-shadow">{movie.vote_average.toFixed(1)}</span>
+            {year && <span className="text-xs text-white/80 drop-shadow">· {year}</span>}
+          </div>
         </div>
 
-        <CardContent className="p-3 space-y-2">
+        <CardContent className="p-3 flex flex-col flex-1 gap-1.5">
           <p className="font-semibold text-sm leading-tight line-clamp-2">{movie.title}</p>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            <span>{movie.vote_average.toFixed(1)}</span>
-            {year && <span>· {year}</span>}
+          <div className="mt-auto flex flex-wrap gap-1">
+            {movieGenres.map((g) => (
+              <Badge key={g.id} variant="secondary" className="text-xs px-1.5 py-0">
+                {g.name}
+              </Badge>
+            ))}
           </div>
-          {movieGenres.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {movieGenres.map((g) => (
-                <Badge key={g.id} variant="secondary" className="text-xs px-1.5 py-0">
-                  {g.name}
-                </Badge>
-              ))}
-            </div>
-          )}
         </CardContent>
       </Card>
     </Link>
@@ -88,11 +93,10 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
 export function MovieCardSkeleton() {
   return (
     <Card className="overflow-hidden">
-      <Skeleton className="aspect-[2/3] w-full" />
+      <Skeleton className="aspect-video w-full" />
       <CardContent className="p-3 space-y-2">
         <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-3 w-1/2" />
-        <Skeleton className="h-5 w-16" />
+        <Skeleton className="h-5 w-20" />
       </CardContent>
     </Card>
   )

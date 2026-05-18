@@ -3,6 +3,8 @@ import { useEffect } from 'react'
 import { MovieCard, MovieCardSkeleton } from './movie-card'
 import type { Movie, Genre } from '@/shared/api/tmdb.types'
 
+const GRID_COLS = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+
 interface MovieGridProps {
   movies: Movie[]
   genres: Genre[]
@@ -17,7 +19,7 @@ export function MovieGrid({ movies, genres, isLoading, isError }: MovieGridProps
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className={GRID_COLS}>
         {Array.from({ length: 20 }).map((_, i) => (
           <MovieCardSkeleton key={i} />
         ))}
@@ -35,7 +37,7 @@ export function MovieGrid({ movies, genres, isLoading, isError }: MovieGridProps
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {movies.map((movie) => (
         <MovieCard key={movie.id} movie={movie} genres={genres} />
       ))}

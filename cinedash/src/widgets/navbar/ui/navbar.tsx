@@ -16,35 +16,38 @@ export function Navbar() {
     navigate({ to: '/' })
   }
 
+  const discoveryActive = pathname.startsWith('/discovery')
+  const watchlistActive = pathname === '/watchlist'
+
   return (
-    <header className="sticky top-0 z-50 flex h-14 items-center gap-6 border-b border-border bg-card px-6">
-      <span className="font-mono text-base font-bold uppercase tracking-widest text-primary">
+    <header className="sticky top-0 z-50 flex h-14 items-center gap-3 border-b border-border bg-card px-4 sm:px-6">
+      <span className="font-mono text-sm sm:text-base font-bold uppercase tracking-widest text-primary shrink-0">
         Cinedash
       </span>
 
-      <nav className="flex flex-1 items-center gap-1">
+      <nav className="flex flex-1 items-center gap-0.5">
         <Link
           to="/discovery"
-          className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-            pathname.startsWith('/discovery')
+          className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+            discoveryActive
               ? 'text-foreground border-b-2 border-primary rounded-none pb-[5px]'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <Film className="h-4 w-4" />
-          Discovery
+          <Film className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">Discovery</span>
         </Link>
 
         <Link
           to="/watchlist"
-          className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-            pathname === '/watchlist'
+          className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+            watchlistActive
               ? 'text-foreground border-b-2 border-primary rounded-none pb-[5px]'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          <List className="h-4 w-4" />
-          Watchlist
+          <List className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline">Watchlist</span>
           {watchlistCount > 0 && (
             <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-mono text-[10px] font-bold text-primary-foreground">
               {watchlistCount}
@@ -53,7 +56,7 @@ export function Navbar() {
         </Link>
       </nav>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <button
           onClick={toggle}
           aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
@@ -64,10 +67,11 @@ export function Navbar() {
 
         <button
           onClick={handleLogout}
+          aria-label="Sair"
           className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
         >
           <LogOut className="h-3.5 w-3.5" />
-          Sair
+          <span className="hidden sm:inline">Sair</span>
         </button>
       </div>
     </header>
