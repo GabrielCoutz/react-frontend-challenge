@@ -28,7 +28,13 @@ export function MovieDetailsPage() {
       remove(movie.id)
       toast.success(`"${movie.title}" removido da lista`)
     } else {
-      add(movie)
+      add({
+        id: movie.id,
+        title: movie.title,
+        genre_ids: movie.genre_ids,
+        release_date: movie.release_date,
+        vote_average: movie.vote_average,
+      })
       toast.success(`"${movie.title}" adicionado à lista`)
     }
   }

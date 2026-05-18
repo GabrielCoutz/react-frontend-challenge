@@ -1,10 +1,17 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Movie } from '@/shared/api/tmdb.types'
+
+export interface WatchlistMovie {
+  id: number
+  title: string
+  genre_ids: number[]
+  release_date: string
+  vote_average: number
+}
 
 interface WatchlistState {
-  movies: Movie[]
-  add: (movie: Movie) => void
+  movies: WatchlistMovie[]
+  add: (movie: WatchlistMovie) => void
   remove: (movieId: number) => void
   isInWatchlist: (movieId: number) => boolean
 }
@@ -14,7 +21,7 @@ export const useWatchlistStore = create<WatchlistState>()(
     (set, get) => ({
       movies: [],
 
-      add: (movie: Movie) => {
+      add: (movie: WatchlistMovie) => {
         if (get().isInWatchlist(movie.id)) return
         set((state) => ({ movies: [...state.movies, movie] }))
       },

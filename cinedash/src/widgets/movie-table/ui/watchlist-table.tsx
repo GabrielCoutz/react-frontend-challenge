@@ -8,7 +8,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowUpDown, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -22,14 +22,14 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useGenres } from "@/entities/movie/api/use-genres";
-import type { Movie } from "@/shared/api/tmdb.types";
+import type { WatchlistMovie } from "@/features/watchlist/model/watchlist-store";
 
 interface WatchlistTableProps {
-  movies: Movie[];
+  movies: WatchlistMovie[];
   onRemove: (movieId: number) => void;
 }
 
-const columnHelper = createColumnHelper<Movie>();
+const columnHelper = createColumnHelper<WatchlistMovie>();
 
 const RATINGS = ["all", "6", "7", "7.5", "8", "8.5", "9"];
 
@@ -44,86 +44,100 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const { data: genres = [] } = useGenres();
 
-  const genreNameById = (id: number) =>
-    genres.find((g) => g.id === id)?.name ?? "—";
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("title", {
+        header: ({ column }) => (
+          <button
+            className="flex items-center font-medium"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Título
+            <SortIcon sorted={column.getIsSorted()} />
+          </button>
+        ),
+        cell: ({ row }) => (
+          <Link
+            to="/movie/$id"
+            params={{ id: String(row.original.id) }}
+            className="font-medium hover:underline line-clamp-1"
+          >
+            {row.original.title}
+          </Link>
+        ),
+        filterFn: "includesString",
+      }),
 
-  const columns = [
-    columnHelper.accessor("title", {
-      header: ({ column }) => (
-        <button
-          className="flex items-center font-medium"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Título
-          <SortIcon sorted={column.getIsSorted()} />
-        </button>
-      ),
-      cell: ({ row }) => (
-        <Link
-          to="/movie/$id"
-          params={{ id: String(row.original.id) }}
-          className="font-medium hover:underline line-clamp-1"
-        >
-          {row.original.title}
-        </Link>
-      ),
-      filterFn: "includesString",
-    }),
+      columnHelper.accessor((row) => row.genre_ids?.[0] ?? 0, {
+        id: "genre",
+        header: ({ column }) => (
+          <button
+            className="flex items-center font-medium"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Gênero
+            <SortIcon sorted={column.getIsSorted()} />
+          </button>
+        ),
+        cell: ({ row }) => {
+          const name =
+            genres.find((g) => g.id === (row.original.genre_ids?.[0] ?? 0))
+              ?.name ?? "—";
+          return <Badge variant="secondary">{name}</Badge>;
+        },
+        sortingFn: (a, b) => {
+          const nameA =
+            genres.find((g) => g.id === (a.original.genre_ids?.[0] ?? 0))
+              ?.name ?? "";
+          const nameB =
+            genres.find((g) => g.id === (b.original.genre_ids?.[0] ?? 0))
+              ?.name ?? "";
+          return nameA.localeCompare(nameB);
+        },
+      }),
 
-    columnHelper.accessor((row) => genreNameById(row.genre_ids[0] ?? 0), {
-      id: "genre",
-      header: ({ column }) => (
-        <button
-          className="flex items-center font-medium"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Gênero
-          <SortIcon sorted={column.getIsSorted()} />
-        </button>
-      ),
-      cell: ({ getValue }) => <Badge variant="secondary">{getValue()}</Badge>,
-    }),
+      columnHelper.accessor("release_date", {
+        header: "Data",
+        cell: ({ getValue }) => getValue()?.slice(0, 4) ?? "—",
+      }),
 
-    columnHelper.accessor("release_date", {
-      header: "Data",
-      cell: ({ getValue }) => getValue()?.slice(0, 4) ?? "—",
-    }),
+      columnHelper.accessor("vote_average", {
+        header: ({ column }) => (
+          <button
+            className="flex items-center font-medium"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Rating
+            <SortIcon sorted={column.getIsSorted()} />
+          </button>
+        ),
+        cell: ({ getValue }) => (
+          <span className="font-medium">★ {getValue().toFixed(1)}</span>
+        ),
+        filterFn: (row, _columnId, filterValue: string) => {
+          if (!filterValue || filterValue === "all") return true;
+          return row.original.vote_average >= Number(filterValue);
+        },
+      }),
 
-    columnHelper.accessor("vote_average", {
-      header: ({ column }) => (
-        <button
-          className="flex items-center font-medium"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Rating
-          <SortIcon sorted={column.getIsSorted()} />
-        </button>
-      ),
-      cell: ({ getValue }) => (
-        <span className="font-medium">★ {getValue().toFixed(1)}</span>
-      ),
-      filterFn: (row, _columnId, filterValue: string) => {
-        if (!filterValue || filterValue === "all") return true;
-        return row.original.vote_average >= Number(filterValue);
-      },
-    }),
-
-    columnHelper.display({
-      id: "actions",
-      header: "Ações",
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-destructive hover:text-destructive"
-          onClick={() => onRemove(row.original.id)}
-          aria-label="Remover da lista"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      ),
-    }),
-  ];
+      columnHelper.display({
+        id: "actions",
+        header: "Ações",
+        cell: ({ row }) => (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive hover:text-destructive"
+            onClick={() => onRemove(row.original.id)}
+            aria-label="Remover da lista"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        ),
+      }),
+    ],
+    [genres, onRemove],
+  );
 
   const table = useReactTable({
     data: movies,
