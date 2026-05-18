@@ -11,8 +11,46 @@ import { ArrowUpDown, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useGenres } from "@/entities/movie/api/use-genres";
 import type { WatchlistMovie } from "@/features/watchlist/model/watchlist-store";
+
+function RemoveButton({ title, onConfirm }: { title: string; onConfirm: () => void }) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger
+        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+        aria-label="Remover da lista"
+      >
+        <Trash2 className="h-4 w-4" />
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Remover da lista?</AlertDialogTitle>
+          <AlertDialogDescription>
+            "{title}" será removido da sua watchlist. Esta ação não pode ser desfeita.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} className="bg-destructive text-white hover:bg-destructive/90">
+            Remover
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
 
 interface WatchlistTableProps {
   movies: WatchlistMovie[];
@@ -82,9 +120,7 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
         id: "actions",
         header: "Ações",
         cell: ({ row }) => (
-          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => onRemove(row.original.id)} aria-label="Remover da lista">
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <RemoveButton title={row.original.title} onConfirm={() => onRemove(row.original.id)} />
         ),
       }),
     ],
@@ -127,15 +163,9 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
                 >
                   {movie.title}
                 </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive hover:text-destructive shrink-0 -mt-1 -mr-2"
-                  onClick={() => onRemove(movie.id)}
-                  aria-label="Remover da lista"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="shrink-0 -mt-1 -mr-2">
+                  <RemoveButton title={movie.title} onConfirm={() => onRemove(movie.id)} />
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-sm">
