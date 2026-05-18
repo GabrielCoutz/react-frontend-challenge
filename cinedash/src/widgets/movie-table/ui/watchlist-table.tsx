@@ -100,29 +100,79 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const rows = table.getRowModel().rows;
+
+  if (rows.length === 0) {
+    return (
+      <div className="rounded-md border px-4 py-12 text-center text-muted-foreground text-sm">
+        Nenhum filme na lista
+      </div>
+    )
+  }
+
   return (
-    <div className="overflow-x-auto rounded-md border">
-      <table className="w-full min-w-[560px] text-sm">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b bg-muted/50">
-              {headerGroup.headers.map((header) => (
-                <th key={header.id} className="px-4 py-3 text-left font-medium text-muted-foreground">
-                  {flexRender(header.column.columnDef.header, header.getContext())}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.length === 0 ? (
-            <tr>
-              <td colSpan={columns.length} className="px-4 py-12 text-center text-muted-foreground">
-                Nenhum filme na lista
-              </td>
-            </tr>
-          ) : (
-            table.getRowModel().rows.map((row) => (
+    <>
+      {/* Mobile — layout em cards */}
+      <div className="sm:hidden space-y-3">
+        {rows.map((row) => {
+          const movie = row.original
+          const genreName = genres.find((g) => g.id === (movie.genre_ids?.[0] ?? 0))?.name ?? "—"
+          return (
+            <div key={row.id} className="rounded-md border bg-card p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <Link
+                  to="/movie/$id"
+                  params={{ id: String(movie.id) }}
+                  className="font-semibold text-sm hover:underline leading-tight"
+                >
+                  {movie.title}
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive hover:text-destructive shrink-0 -mt-1 -mr-2"
+                  onClick={() => onRemove(movie.id)}
+                  aria-label="Remover da lista"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-sm">
+                <div className="space-y-0.5">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Gênero</p>
+                  <Badge variant="secondary" className="text-xs">{genreName}</Badge>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Ano</p>
+                  <p className="text-sm">{movie.release_date?.slice(0, 4) ?? "—"}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Rating</p>
+                  <p className="text-sm font-medium">★ {movie.vote_average.toFixed(1)}</p>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Desktop — tabela com colunas */}
+      <div className="hidden sm:block overflow-x-auto rounded-md border">
+        <table className="w-full text-sm">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="border-b bg-muted/50">
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} className="px-4 py-3 text-left font-medium text-muted-foreground">
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {rows.map((row) => (
               <tr key={row.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-4 py-3">
@@ -130,10 +180,10 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
                   </td>
                 ))}
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
