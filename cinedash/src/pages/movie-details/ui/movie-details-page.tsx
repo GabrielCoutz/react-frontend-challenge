@@ -31,7 +31,9 @@ export function MovieDetailsPage() {
       add({
         id: movie.id,
         title: movie.title,
-        genre_ids: movie.genre_ids,
+        genre_ids: movie.genre_ids?.length
+          ? movie.genre_ids
+          : (movie.genres?.map((g) => g.id) ?? []),
         release_date: movie.release_date,
         vote_average: movie.vote_average,
       });

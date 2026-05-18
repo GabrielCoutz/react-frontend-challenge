@@ -26,8 +26,15 @@ import { useGenres } from "@/entities/movie/api/use-genres";
 import type { WatchlistMovie } from "@/features/watchlist/model/watchlist-store";
 
 function RemoveButton({ title, onConfirm }: { title: string; onConfirm: () => void }) {
+  const [open, setOpen] = useState(false)
+
+  const handleConfirm = () => {
+    setOpen(false)
+    onConfirm()
+  }
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger
         className="inline-flex h-8 w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
         aria-label="Remover da lista"
@@ -43,7 +50,7 @@ function RemoveButton({ title, onConfirm }: { title: string; onConfirm: () => vo
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-destructive text-white hover:bg-destructive/90">
+          <AlertDialogAction onClick={handleConfirm} className="bg-destructive text-white hover:bg-destructive/90">
             Remover
           </AlertDialogAction>
         </AlertDialogFooter>
