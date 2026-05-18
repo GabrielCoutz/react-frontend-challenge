@@ -40,16 +40,20 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <div className="space-y-1">
         <Input
           type="email"
           placeholder="Email"
           {...register("email")}
           aria-label="Email"
+          aria-invalid={!!errors.email}
+          aria-describedby={errors.email ? "email-error" : undefined}
         />
         {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
+          <p id="email-error" role="alert" className="text-sm text-destructive">
+            {errors.email.message}
+          </p>
         )}
       </div>
 
@@ -59,13 +63,17 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           placeholder="Senha"
           {...register("password")}
           aria-label="Senha"
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "password-error" : undefined}
         />
         {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
+          <p id="password-error" role="alert" className="text-sm text-destructive">
+            {errors.password.message}
+          </p>
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+      <Button type="submit" className="w-full" disabled={isSubmitting} aria-busy={isSubmitting}>
         {isSubmitting ? "Entrando..." : "Entrar"}
       </Button>
     </form>

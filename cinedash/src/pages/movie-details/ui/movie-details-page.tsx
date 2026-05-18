@@ -66,7 +66,7 @@ export function MovieDetailsPage() {
 
       <div className="container mx-auto px-4 sm:px-6 py-6 space-y-6 sm:space-y-8">
         <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
-          <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
+          <ArrowLeft className="h-4 w-4 mr-1" aria-hidden="true" /> Voltar
         </Button>
 
         {/* Poster + Info */}
@@ -80,7 +80,7 @@ export function MovieDetailsPage() {
               <h1 className="text-2xl sm:text-3xl font-bold leading-tight">{movie.title}</h1>
               <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" aria-hidden="true" />
                   {movie.vote_average.toFixed(1)}
                 </span>
                 {movie.release_date && <span>{movie.release_date.slice(0, 4)}</span>}
@@ -102,11 +102,16 @@ export function MovieDetailsPage() {
               {movie.overview}
             </p>
 
-            <Button onClick={handleWatchlistToggle} variant={inWatchlist ? "secondary" : "default"}>
+            <Button
+              onClick={handleWatchlistToggle}
+              variant={inWatchlist ? "secondary" : "default"}
+              aria-pressed={inWatchlist}
+              aria-label={inWatchlist ? `Remover ${movie.title} da watchlist` : `Adicionar ${movie.title} à watchlist`}
+            >
               {inWatchlist ? (
-                <><Check className="h-4 w-4 mr-2" /> Na lista</>
+                <><Check className="h-4 w-4 mr-2" aria-hidden="true" /> Na lista</>
               ) : (
-                <><Plus className="h-4 w-4 mr-2" /> Adicionar à lista</>
+                <><Plus className="h-4 w-4 mr-2" aria-hidden="true" /> Adicionar à lista</>
               )}
             </Button>
           </div>

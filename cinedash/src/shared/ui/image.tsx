@@ -16,8 +16,12 @@ export function Image({ src, alt, className, skeletonClassName, fallbackClassNam
 
   if (!src || status === 'error') {
     return (
-      <div className={cn('flex items-center justify-center bg-muted text-muted-foreground', fallbackClassName ?? className)}>
-        <ImageOff className="h-1/4 w-1/4 opacity-30" />
+      <div
+        role="img"
+        aria-label={alt || undefined}
+        className={cn('flex items-center justify-center bg-muted text-muted-foreground', fallbackClassName ?? className)}
+      >
+        <ImageOff className="h-1/4 w-1/4 opacity-30" aria-hidden="true" />
       </div>
     )
   }

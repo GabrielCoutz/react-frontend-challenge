@@ -208,10 +208,10 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
             </CommandList>
           </Command>
           <div className="border-t border-border p-2 flex gap-2">
-            <button onClick={() => setPendingIds([])} className="flex-1 rounded-md py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => setPendingIds([])} aria-label="Limpar seleção de gêneros" className="flex-1 rounded-md py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
               Limpar
             </button>
-            <button onClick={applyGenres} className="flex-1 rounded-md bg-primary py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+            <button onClick={applyGenres} aria-label={`Aplicar ${pendingIds.length} gênero${pendingIds.length !== 1 ? 's' : ''} selecionado${pendingIds.length !== 1 ? 's' : ''}`} className="flex-1 rounded-md bg-primary py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
               Aplicar {pendingIds.length > 0 && `(${pendingIds.length})`}
             </button>
           </div>
@@ -225,8 +225,12 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
             return (
               <Badge key={id} variant="secondary" className="text-xs gap-1 pr-1">
                 {name}
-                <button className="cursor-pointer" onClick={() => onChange({ ...filters, genreIds: filters.genreIds.filter((g) => g !== id) })}>
-                  <X className="h-2.5 w-2.5" />
+                <button
+                  className="cursor-pointer"
+                  aria-label={`Remover gênero ${name}`}
+                  onClick={() => onChange({ ...filters, genreIds: filters.genreIds.filter((g) => g !== id) })}
+                >
+                  <X className="h-2.5 w-2.5" aria-hidden="true" />
                 </button>
               </Badge>
             )
@@ -261,6 +265,8 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
         <Slider
           min={0} max={10} step={0.5}
           value={[ratingDisplay]}
+          aria-label="Nota mínima"
+          aria-valuetext={ratingDisplay > 0 ? `${ratingDisplay} de 10` : 'Sem filtro de nota'}
           onValueChange={(raw) => {
             const v = Array.isArray(raw) ? raw[0] : raw
             setRatingDisplay(v ?? 0)
@@ -275,7 +281,7 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
 
       {hasActiveFilters && (
         <button onClick={handleClearAll} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors">
-          <X className="h-3 w-3" />
+          <X className="h-3 w-3" aria-hidden="true" />
           Limpar filtros
         </button>
       )}

@@ -86,7 +86,6 @@ describe('WatchlistTable', () => {
     const ratingHeader = screen.getByRole('button', { name: /rating/i })
     await userEvent.click(ratingHeader)
     const rows = screen.getAllByRole('row').slice(1)
-    const firstCell = within(rows[0]!).getByText(/★/)
-    expect(firstCell.textContent).toContain('6.5')
+    expect(within(rows[0]!).getByText('6.5')).toBeInTheDocument()
   })
 })

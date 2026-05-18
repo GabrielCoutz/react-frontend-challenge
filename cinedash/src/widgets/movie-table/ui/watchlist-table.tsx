@@ -120,7 +120,13 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
             Rating <SortIcon sorted={column.getIsSorted()} />
           </button>
         ),
-        cell: ({ getValue }) => <span className="font-medium">★ {getValue().toFixed(1)}</span>,
+        cell: ({ getValue }) => (
+          <span className="font-medium">
+            <span aria-hidden="true">★ </span>
+            <span className="sr-only">Avaliação: </span>
+            {getValue().toFixed(1)}
+          </span>
+        ),
       }),
 
       columnHelper.display({
@@ -156,12 +162,12 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
   return (
     <>
       {/* Mobile — layout em cards */}
-      <div className="sm:hidden space-y-3">
+      <ul className="sm:hidden space-y-3" aria-label="Watchlist de filmes">
         {rows.map((row) => {
           const movie = row.original
           const genreName = genres.find((g) => g.id === (movie.genre_ids?.[0] ?? 0))?.name ?? "—"
           return (
-            <div key={row.id} className="rounded-md border bg-card p-4 space-y-3">
+            <li key={row.id} className="rounded-md border bg-card p-4 space-y-3">
               <div className="flex items-start justify-between gap-2">
                 <Link
                   to="/movie/$id"
@@ -186,22 +192,34 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
                 </div>
                 <div className="space-y-0.5">
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Rating</p>
-                  <p className="text-sm font-medium">★ {movie.vote_average.toFixed(1)}</p>
+                  <p className="text-sm font-medium">
+                    <span aria-hidden="true">★ </span>
+                    <span className="sr-only">Avaliação: </span>
+                    {movie.vote_average.toFixed(1)}
+                  </p>
                 </div>
               </div>
-            </div>
+            </li>
           )
         })}
-      </div>
+      </ul>
 
       {/* Desktop — tabela com colunas */}
       <div className="hidden sm:block overflow-x-auto rounded-md border">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm" aria-label="Watchlist de filmes">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-b bg-muted/50">
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  <th
+                    key={header.id}
+                    className="px-4 py-3 text-left font-medium text-muted-foreground"
+                    aria-sort={
+                      header.column.getIsSorted() === 'asc' ? 'ascending'
+                      : header.column.getIsSorted() === 'desc' ? 'descending'
+                      : header.column.getCanSort() ? 'none' : undefined
+                    }
+                  >
                     {flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 ))}

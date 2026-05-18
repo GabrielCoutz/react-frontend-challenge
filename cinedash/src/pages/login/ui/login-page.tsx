@@ -39,7 +39,7 @@ export function LoginPage() {
       {/* Painel esquerdo — branding */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-card border-r border-border p-12">
         <div className="flex items-center gap-3">
-          <Film className="h-6 w-6 text-primary" />
+          <Film className="h-6 w-6 text-primary" aria-hidden="true" />
           <span className="font-mono text-lg font-bold uppercase tracking-widest text-primary">
             Cinedash
           </span>
@@ -62,7 +62,7 @@ export function LoginPage() {
       </div>
 
       {/* Painel direito — formulário */}
-      <div className="flex flex-1 flex-col items-center justify-center p-6 sm:p-12">
+      <main className="flex flex-1 flex-col items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-sm space-y-8">
           {/* Logo — visível só em mobile */}
           <div className="flex lg:hidden items-center justify-center gap-2">
@@ -85,7 +85,7 @@ export function LoginPage() {
             Use qualquer email e senha com 6+ caracteres
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
