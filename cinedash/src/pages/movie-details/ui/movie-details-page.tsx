@@ -86,15 +86,17 @@ export function MovieDetailsPage() {
                 {movie.release_date && <span>{movie.release_date.slice(0, 4)}</span>}
               </div>
               {movie.genres && (
-                <div className="flex flex-wrap gap-2">
+                <ul className="flex flex-wrap gap-2" aria-label="Gêneros">
                   {movie.genres.map((g) => (
-                    <Link key={g.id} to="/discovery" search={{ genreIds: [String(g.id)], page: 1 }}>
-                      <Badge variant="secondary" className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
-                        {g.name}
-                      </Badge>
-                    </Link>
+                    <li key={g.id}>
+                      <Link to="/discovery" search={{ genreIds: [String(g.id)], page: 1 }} aria-label={`Filtrar por gênero: ${g.name}`}>
+                        <Badge variant="secondary" className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
+                          {g.name}
+                        </Badge>
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
 
@@ -121,33 +123,34 @@ export function MovieDetailsPage() {
         {topCast.length > 0 && (
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-semibold">Elenco</h2>
-            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 pl-1 pt-1">
+            <ul className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 pl-1 pt-1" aria-label="Elenco principal">
               {topCast.map((actor) => {
                 const photo = getImageUrl(actor.profile_path, "w185");
                 return (
-                  <Link
-                    key={actor.id}
-                    to="/discovery"
-                    search={{ personId: actor.id, personName: actor.name, page: 1 }}
-                    className="shrink-0 w-20 sm:w-24 text-center space-y-1 group/actor"
-                    title={`Ver filmes de ${actor.name}`}
-                  >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto">
-                      <div className="absolute inset-0 rounded-full ring-2 ring-transparent group-hover/actor:ring-primary transition-all z-10 pointer-events-none" />
-                      <div className="w-full h-full rounded-full overflow-hidden bg-muted">
-                        <Image src={photo} alt={actor.name} className="w-full h-full object-cover" />
+                  <li key={actor.id} className="shrink-0">
+                    <Link
+                      to="/discovery"
+                      search={{ personId: actor.id, personName: actor.name, page: 1 }}
+                      className="flex flex-col w-20 sm:w-24 text-center space-y-1 group/actor"
+                      aria-label={`Ver filmes de ${actor.name}`}
+                    >
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto">
+                        <div className="absolute inset-0 rounded-full ring-2 ring-transparent group-hover/actor:ring-primary transition-all z-10 pointer-events-none" />
+                        <div className="w-full h-full rounded-full overflow-hidden bg-muted">
+                          <Image src={photo} alt={actor.name} className="w-full h-full object-cover" />
+                        </div>
                       </div>
-                    </div>
-                    <p className="text-xs font-medium line-clamp-2 group-hover/actor:text-primary transition-colors">
-                      {actor.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {actor.character}
-                    </p>
-                  </Link>
+                      <p className="text-xs font-medium line-clamp-2 group-hover/actor:text-primary transition-colors">
+                        {actor.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">
+                        {actor.character}
+                      </p>
+                    </Link>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </section>
         )}
 
