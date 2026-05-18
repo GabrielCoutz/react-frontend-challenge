@@ -1,18 +1,20 @@
-import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Film, List, LogOut } from "lucide-react";
-import { useAuthStore } from "@/entities/user/model/auth-store";
-import { useWatchlistStore } from "@/features/watchlist/model/watchlist-store";
+import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
+import { Film, List, LogOut, Sun, Moon } from 'lucide-react'
+import { useAuthStore } from '@/entities/user/model/auth-store'
+import { useWatchlistStore } from '@/features/watchlist/model/watchlist-store'
+import { useThemeStore } from '@/features/theme/model/theme-store'
 
 export function Navbar() {
-  const logout = useAuthStore((s) => s.logout);
-  const watchlistCount = useWatchlistStore((s) => s.movies.length);
-  const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const logout = useAuthStore((s) => s.logout)
+  const watchlistCount = useWatchlistStore((s) => s.movies.length)
+  const { theme, toggle } = useThemeStore()
+  const navigate = useNavigate()
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   const handleLogout = () => {
-    logout();
-    navigate({ to: "/" });
-  };
+    logout()
+    navigate({ to: '/' })
+  }
 
   return (
     <header className="sticky top-0 z-50 flex h-14 items-center gap-6 border-b border-border bg-card px-6">
@@ -24,9 +26,9 @@ export function Navbar() {
         <Link
           to="/discovery"
           className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-            pathname.startsWith("/discovery")
-              ? "text-foreground border-b-2 border-primary rounded-none pb-[5px]"
-              : "text-muted-foreground hover:text-foreground"
+            pathname.startsWith('/discovery')
+              ? 'text-foreground border-b-2 border-primary rounded-none pb-[5px]'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           <Film className="h-4 w-4" />
@@ -36,9 +38,9 @@ export function Navbar() {
         <Link
           to="/watchlist"
           className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-            pathname === "/watchlist"
-              ? "text-foreground border-b-2 border-primary rounded-none pb-[5px]"
-              : "text-muted-foreground hover:text-foreground"
+            pathname === '/watchlist'
+              ? 'text-foreground border-b-2 border-primary rounded-none pb-[5px]'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           <List className="h-4 w-4" />
@@ -51,13 +53,23 @@ export function Navbar() {
         </Link>
       </nav>
 
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
-      >
-        <LogOut className="h-3.5 w-3.5" />
-        Sair
-      </button>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={toggle}
+          aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+          className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+        >
+          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+          Sair
+        </button>
+      </div>
     </header>
-  );
+  )
 }
