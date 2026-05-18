@@ -1,6 +1,7 @@
 import type {
   Genre,
   Movie,
+  Person,
   PaginatedResponse,
   CreditsResponse,
   VideosResponse,
@@ -58,10 +59,19 @@ export const tmdbApi = {
     with_genres?: string;
     primary_release_year?: number;
     "vote_average.gte"?: number;
+    with_cast?: number;
   }): Promise<PaginatedResponse<Movie>> => {
     const { data } = await tmdbClient.get<PaginatedResponse<Movie>>(
       "/discover/movie",
       { params },
+    );
+    return data;
+  },
+
+  searchPerson: async (query: string): Promise<PaginatedResponse<Person>> => {
+    const { data } = await tmdbClient.get<PaginatedResponse<Person>>(
+      "/search/person",
+      { params: { query } },
     );
     return data;
   },

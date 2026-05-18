@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from '@tanstack/react-router'
+import { useParams, useNavigate, Link } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { ArrowLeft, Star, Plus, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ import { getImageUrl } from '@/shared/api/tmdb-client'
 export function MovieDetailsPage() {
   const { id } = useParams({ from: '/_authenticated/movie/$id' })
   const movieId = Number(id)
-  const navigate = useNavigate()
+
 
   const { data: movie, isLoading: loadingMovie } = useMovie(movieId)
   const { data: credits, isLoading: loadingCredits } = useCredits(movieId)
@@ -63,7 +63,7 @@ export function MovieDetailsPage() {
       )}
 
       <div className="container mx-auto p-6 space-y-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate({ to: '/discovery' })}>
+        <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
         </Button>
 
@@ -114,8 +114,14 @@ export function MovieDetailsPage() {
               {topCast.map((actor) => {
                 const photo = getImageUrl(actor.profile_path, 'w185')
                 return (
-                  <div key={actor.id} className="shrink-0 w-24 text-center space-y-1">
-                    <div className="w-24 h-24 rounded-full overflow-hidden bg-muted mx-auto">
+                  <Link
+                    key={actor.id}
+                    to="/discovery"
+                    search={{ personId: actor.id, personName: actor.name, page: 1 }}
+                    className="shrink-0 w-24 text-center space-y-1 group/actor"
+                    title={`Ver filmes de ${actor.name}`}
+                  >
+                    <div className="w-24 h-24 rounded-full overflow-hidden bg-muted mx-auto ring-2 ring-transparent group-hover/actor:ring-primary transition-all">
                       {photo ? (
                         <img src={photo} alt={actor.name} className="w-full h-full object-cover" />
                       ) : (
@@ -124,9 +130,9 @@ export function MovieDetailsPage() {
                         </div>
                       )}
                     </div>
-                    <p className="text-xs font-medium line-clamp-2">{actor.name}</p>
+                    <p className="text-xs font-medium line-clamp-2 group-hover/actor:text-primary transition-colors">{actor.name}</p>
                     <p className="text-xs text-muted-foreground line-clamp-1">{actor.character}</p>
-                  </div>
+                  </Link>
                 )
               })}
             </div>

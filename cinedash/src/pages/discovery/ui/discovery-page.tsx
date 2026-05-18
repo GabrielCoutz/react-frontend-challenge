@@ -61,6 +61,8 @@ export function DiscoveryPage() {
     genreIds = [],
     year,
     minRating,
+    personId,
+    personName,
     page = 1,
   } = useSearch({
     from: "/_authenticated/discovery",
@@ -69,11 +71,11 @@ export function DiscoveryPage() {
   const { data: genres = [] } = useGenres();
   const filters: MovieFilters = { genreIds, year, minRating };
   const isSearching = query.trim().length > 0;
-  const isFiltering = hasFilters(filters);
+  const isFiltering = hasFilters(filters) || !!personId;
 
   const trending = useTrending(page);
   const searchResults = useMovieSearch(query, page);
-  const discover = useDiscover({ page, genreIds, year, minRating });
+  const discover = useDiscover({ page, genreIds, year, minRating, personId });
 
   const active = isSearching
     ? searchResults
@@ -113,9 +115,22 @@ export function DiscoveryPage() {
 
   const sectionTitle = isSearching
     ? `Resultados para "${query}"`
-    : isFiltering
-      ? "Filmes filtrados"
-      : "Trending Esta Semana";
+    : personId
+      ? `Filmes com ${personName ?? '...'}`
+      : isFiltering
+        ? "Filmes filtrados"
+        : "Trending Esta Semana";
+
+  const handlePersonChange = (id: number | undefined, name: string | undefined) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        personId: id,
+        personName: name,
+        page: 1,
+      }),
+    })
+  }
 
   return (
     <div className="flex">
@@ -125,7 +140,14 @@ export function DiscoveryPage() {
           Filtros
         </p>
         <SearchInput onSearch={handleSearch} initialValue={query} />
-        <FilterBar filters={filters} onChange={handleFilters} sidebar />
+        <FilterBar
+          filters={filters}
+          onChange={handleFilters}
+          sidebar
+          personId={personId}
+          personName={personName}
+          onPersonChange={handlePersonChange}
+        />
       </aside>
 
       {/* Conteúdo principal */}

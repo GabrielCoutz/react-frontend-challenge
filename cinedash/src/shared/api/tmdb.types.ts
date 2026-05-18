@@ -41,6 +41,13 @@ export interface PaginatedResponse<T> {
   total_results: number
 }
 
+export interface Person {
+  id: number
+  name: string
+  profile_path: string | null
+  known_for_department: string
+}
+
 export interface CreditsResponse {
   id: number
   cast: Cast[]

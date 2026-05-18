@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Check, ChevronsUpDown, X, User } from 'lucide-react'
+import { toast } from 'sonner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import {
@@ -11,7 +12,11 @@ import {
 } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useGenres } from '@/entities/movie/api/use-genres'
+import { usePersonSearch } from '@/entities/movie/api/use-person-search'
+import { useDebounce } from '@/shared/hooks/use-debounce'
+import { getImageUrl } from '@/shared/api/tmdb-client'
 import { cn } from '@/lib/utils'
 
 export interface MovieFilters {
@@ -24,19 +29,32 @@ interface FilterBarProps {
   filters: MovieFilters
   onChange: (filters: MovieFilters) => void
   sidebar?: boolean
+  personId?: number
+  personName?: string
+  onPersonChange?: (id: number | undefined, name: string | undefined) => void
 }
 
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i)
 const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined }
 
-export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps) {
+export function FilterBar({ filters, onChange, sidebar = false, personId, personName, onPersonChange }: FilterBarProps) {
   const { data: genres = [] } = useGenres()
   const [genreOpen, setGenreOpen] = useState(false)
+  const [personOpen, setPersonOpen] = useState(false)
+  const [personQuery, setPersonQuery] = useState('')
   const [pendingIds, setPendingIds] = useState<string[]>(filters.genreIds)
   const [ratingDisplay, setRatingDisplay] = useState(filters.minRating ?? 0)
 
-  const hasActiveFilters = filters.genreIds.length > 0 || !!filters.year || !!filters.minRating
+  const debouncedPersonQuery = useDebounce(personQuery, 400)
+  const { data: personResults, isLoading: personLoading, isError: personError } = usePersonSearch(debouncedPersonQuery)
+  const people = personResults?.results.slice(0, 6) ?? []
+
+  useEffect(() => {
+    if (personError) toast.error('Falha ao buscar pessoas. Tente novamente.')
+  }, [personError])
+
+  const hasActiveFilters = filters.genreIds.length > 0 || !!filters.year || !!filters.minRating || !!personId
 
   const toggleGenre = (id: string) => {
     setPendingIds((prev) =>
@@ -60,6 +78,7 @@ export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps
     setPendingIds([])
     setRatingDisplay(0)
     onChange(EMPTY_FILTERS)
+    onPersonChange?.(undefined, undefined)
   }
 
   const genreLabel = () => {
@@ -73,7 +92,91 @@ export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps
   return (
     <div className={sidebar ? 'flex flex-col gap-4' : 'flex flex-wrap items-end gap-4'}>
 
-      {/* Gêneros — multi-select com checkboxes */}
+      {/* Pessoa do elenco (opcional) */}
+      {onPersonChange && (
+        <div className="space-y-1">
+          {sidebar && <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-0.5">Elenco</p>}
+          {personId ? (
+            <div className={cn('inline-flex h-8 items-center gap-2 rounded-lg border border-primary bg-primary/10 px-2.5 text-sm', sidebar && 'w-full justify-between')}>
+              <div className="flex items-center gap-1.5 truncate">
+                <User className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span className="truncate text-primary font-medium">{personName}</span>
+              </div>
+              <button className="cursor-pointer text-primary hover:text-primary/70 shrink-0" onClick={() => onPersonChange(undefined, undefined)}>
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <Popover open={personOpen} onOpenChange={(open) => { if (!open) setPersonQuery(''); setPersonOpen(open) }}>
+              <PopoverTrigger
+                className={cn(
+                  'inline-flex h-8 items-center justify-between rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors hover:bg-accent focus:outline-none text-muted-foreground',
+                  sidebar ? 'w-full' : 'w-44',
+                )}
+              >
+                <span>Elenco</span>
+                <User className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-0" align="start">
+                <Command shouldFilter={false}>
+                  <CommandInput
+                    placeholder="Buscar ator/diretora..."
+                    value={personQuery}
+                    onValueChange={setPersonQuery}
+                  />
+                  <CommandList>
+                    {personQuery.length <= 1 && (
+                      <CommandEmpty className="text-muted-foreground text-xs">Digite ao menos 2 caracteres.</CommandEmpty>
+                    )}
+                    {personQuery.length > 1 && personLoading && (
+                      <div className="space-y-2 p-2">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                          <div key={i} className="flex items-center gap-2 px-1">
+                            <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+                            <Skeleton className="h-4 flex-1" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {personQuery.length > 1 && !personLoading && people.length === 0 && (
+                      <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
+                    )}
+                    <CommandGroup>
+                      {people.map((p) => {
+                        const photo = getImageUrl(p.profile_path, 'w45')
+                        return (
+                          <CommandItem
+                            key={p.id}
+                            value={String(p.id)}
+                            onSelect={() => {
+                              onPersonChange(p.id, p.name)
+                              setPersonQuery('')
+                              setPersonOpen(false)
+                            }}
+                          >
+                            <div className="mr-2 h-8 w-8 shrink-0 overflow-hidden rounded-full bg-muted">
+                              {photo ? (
+                                <img src={photo} alt={p.name} className="h-full w-full object-cover" />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center">
+                                  <User className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-sm truncate">{p.name}</span>
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
+      )}
+
+      {/* Gêneros */}
       <Popover open={genreOpen} onOpenChange={(open) => {
         if (open) setPendingIds(filters.genreIds)
         setGenreOpen(open)
@@ -99,10 +202,7 @@ export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps
                   const selected = pendingIds.includes(id)
                   return (
                     <CommandItem key={g.id} value={g.name} onSelect={() => toggleGenre(id)}>
-                      <div className={cn(
-                        'mr-2 flex h-4 w-4 items-center justify-center rounded border border-border',
-                        selected && 'bg-primary border-primary',
-                      )}>
+                      <div className={cn('mr-2 flex h-4 w-4 items-center justify-center rounded border border-border', selected && 'bg-primary border-primary')}>
                         {selected && <Check className="h-3 w-3 text-white" />}
                       </div>
                       {g.name}
@@ -113,23 +213,16 @@ export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps
             </CommandList>
           </Command>
           <div className="border-t border-border p-2 flex gap-2">
-            <button
-              onClick={() => setPendingIds([])}
-              className="flex-1 rounded-md py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={() => setPendingIds([])} className="flex-1 rounded-md py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
               Limpar
             </button>
-            <button
-              onClick={applyGenres}
-              className="flex-1 rounded-md bg-primary py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
+            <button onClick={applyGenres} className="flex-1 rounded-md bg-primary py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
               Aplicar {pendingIds.length > 0 && `(${pendingIds.length})`}
             </button>
           </div>
         </PopoverContent>
       </Popover>
 
-      {/* Badges dos gêneros selecionados (sidebar) */}
       {sidebar && filters.genreIds.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {filters.genreIds.map((id) => {
@@ -162,7 +255,7 @@ export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps
         </SelectContent>
       </Select>
 
-      {/* Nota mínima — Slider */}
+      {/* Nota mínima */}
       <div className={sidebar ? 'space-y-2' : 'flex flex-col gap-1 min-w-40'}>
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">Nota mínima</span>
@@ -186,10 +279,7 @@ export function FilterBar({ filters, onChange, sidebar = false }: FilterBarProps
       </div>
 
       {hasActiveFilters && (
-        <button
-          onClick={handleClearAll}
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors"
-        >
+        <button onClick={handleClearAll} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors">
           <X className="h-3 w-3" />
           Limpar filtros
         </button>
