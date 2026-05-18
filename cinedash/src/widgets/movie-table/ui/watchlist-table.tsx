@@ -101,8 +101,8 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
   });
 
   return (
-    <div className="rounded-md border">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-md border">
+      <table className="w-full min-w-[560px] text-sm">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} className="border-b bg-muted/50">
