@@ -120,22 +120,18 @@ export function DiscoveryPage() {
   return (
     <div className="flex">
       {/* Sidebar de filtros */}
-      <aside className="w-52 shrink-0 border-r border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto p-4 space-y-6">
-        <div>
-          <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 px-1">
-            Filtros
-          </p>
-          <FilterBar filters={filters} onChange={handleFilters} sidebar />
-        </div>
+      <aside className="w-52 shrink-0 border-r border-border sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto p-4 space-y-4">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1">
+          Filtros
+        </p>
+        <SearchInput onSearch={handleSearch} initialValue={query} />
+        <FilterBar filters={filters} onChange={handleFilters} sidebar />
       </aside>
 
       {/* Conteúdo principal */}
       <main className="flex-1 min-w-0 p-6 space-y-5">
         <div className="flex items-center gap-4 flex-wrap">
           <h1 className="text-xl font-semibold">{sectionTitle}</h1>
-          <div className="flex-1 max-w-sm">
-            <SearchInput onSearch={handleSearch} initialValue={query} />
-          </div>
           {totalPages > 1 && (
             <Pagination
               page={page}
