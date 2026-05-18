@@ -148,7 +148,7 @@ export function MovieDetailsPage() {
         {trailer && (
           <section className="space-y-3">
             <h2 className="text-lg sm:text-xl font-semibold">Trailer</h2>
-            <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden">
+            <div className="aspect-video w-full rounded-lg overflow-hidden">
               <iframe
                 src={`https://www.youtube.com/embed/${trailer.key}`}
                 title={trailer.name}
