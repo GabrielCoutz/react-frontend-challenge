@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ArrowLeft, Star, Plus, Check } from "lucide-react";
@@ -42,6 +43,11 @@ export function MovieDetailsPage() {
   };
 
   const isLoading = loadingMovie || loadingCredits || loadingVideos;
+
+  useEffect(() => {
+    document.title = movie ? `${movie.title} — CineDash` : 'CineDash'
+    return () => { document.title = 'CineDash' }
+  }, [movie?.title])
   const topCast = credits?.cast.slice(0, 5) ?? [];
   const trailer = trailers[0];
   const posterUrl = getImageUrl(movie?.poster_path ?? null, "w500");
