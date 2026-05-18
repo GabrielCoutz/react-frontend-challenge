@@ -9,6 +9,7 @@ import { useCredits } from '@/entities/movie/api/use-credits'
 import { useVideos } from '@/entities/movie/api/use-videos'
 import { useWatchlistStore } from '@/features/watchlist/model/watchlist-store'
 import { getImageUrl } from '@/shared/api/tmdb-client'
+import { Image } from '@/shared/ui/image'
 
 export function MovieDetailsPage() {
   const { id } = useParams({ from: '/_authenticated/movie/$id' })
@@ -55,12 +56,10 @@ export function MovieDetailsPage() {
 
   return (
     <div>
-      {backdropUrl && (
-        <div className="relative h-64 md:h-80 overflow-hidden">
-          <img src={backdropUrl} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-        </div>
-      )}
+      <div className="relative h-64 md:h-80 overflow-hidden bg-muted">
+        <Image src={backdropUrl} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
+      </div>
 
       <div className="container mx-auto p-6 space-y-8">
         <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
@@ -68,13 +67,9 @@ export function MovieDetailsPage() {
         </Button>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {posterUrl && (
-            <img
-              src={posterUrl}
-              alt={movie.title}
-              className="w-48 rounded-lg shadow-lg shrink-0 self-start"
-            />
-          )}
+          <div className="relative w-48 shrink-0 self-start rounded-lg overflow-hidden shadow-lg aspect-[2/3]">
+            <Image src={posterUrl} alt={movie.title} className="w-full h-full object-cover" />
+          </div>
 
           <div className="space-y-4 flex-1">
             <div className="space-y-2">
@@ -121,14 +116,8 @@ export function MovieDetailsPage() {
                     className="shrink-0 w-24 text-center space-y-1 group/actor"
                     title={`Ver filmes de ${actor.name}`}
                   >
-                    <div className="w-24 h-24 rounded-full overflow-hidden bg-muted mx-auto ring-2 ring-transparent group-hover/actor:ring-primary transition-all">
-                      {photo ? (
-                        <img src={photo} alt={actor.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                          Sem foto
-                        </div>
-                      )}
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden bg-muted mx-auto ring-2 ring-transparent group-hover/actor:ring-primary transition-all">
+                      <Image src={photo} alt={actor.name} className="w-full h-full object-cover" />
                     </div>
                     <p className="text-xs font-medium line-clamp-2 group-hover/actor:text-primary transition-colors">{actor.name}</p>
                     <p className="text-xs text-muted-foreground line-clamp-1">{actor.character}</p>

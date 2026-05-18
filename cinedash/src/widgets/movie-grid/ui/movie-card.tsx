@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getImageUrl } from '@/shared/api/tmdb-client'
 import { useWatchlistStore } from '@/features/watchlist/model/watchlist-store'
+import { Image } from '@/shared/ui/image'
 import type { Movie, Genre } from '@/shared/api/tmdb.types'
 
 interface MovieCardProps {
@@ -43,13 +44,11 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
     <Link to="/movie/$id" params={{ id: String(movie.id) }}>
       <Card className="group overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer h-full">
         <div className="aspect-[2/3] relative bg-muted">
-          {posterUrl ? (
-            <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover" loading="lazy" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-              Sem imagem
-            </div>
-          )}
+          <Image
+            src={posterUrl}
+            alt={movie.title}
+            className="w-full h-full object-cover"
+          />
 
           <button
             onClick={handleWatchlist}

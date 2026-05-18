@@ -17,6 +17,7 @@ import { useGenres } from '@/entities/movie/api/use-genres'
 import { usePersonSearch } from '@/entities/movie/api/use-person-search'
 import { useDebounce } from '@/shared/hooks/use-debounce'
 import { getImageUrl } from '@/shared/api/tmdb-client'
+import { Image } from '@/shared/ui/image'
 import { cn } from '@/lib/utils'
 
 export interface MovieFilters {
@@ -154,14 +155,8 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
                               setPersonOpen(false)
                             }}
                           >
-                            <div className="mr-2 h-8 w-8 shrink-0 overflow-hidden rounded-full bg-muted">
-                              {photo ? (
-                                <img src={photo} alt={p.name} className="h-full w-full object-cover" />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center">
-                                  <User className="h-4 w-4 text-muted-foreground" />
-                                </div>
-                              )}
+                            <div className="relative mr-2 h-8 w-8 shrink-0 overflow-hidden rounded-full bg-muted">
+                              <Image src={photo} alt={p.name} className="h-full w-full object-cover" fallbackClassName="h-full w-full" />
                             </div>
                             <span className="text-sm truncate">{p.name}</span>
                           </CommandItem>
