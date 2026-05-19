@@ -109,7 +109,11 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
       }),
 
       columnHelper.accessor("release_date", {
-        header: "Lançamento",
+        header: ({ column }) => (
+          <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Lançamento <SortIcon sorted={column.getIsSorted()} />
+          </button>
+        ),
         cell: ({ getValue }) => {
           const val = getValue()
           if (!val) return "—"
@@ -122,12 +126,24 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
       }),
 
       columnHelper.accessor("certification", {
-        header: "Faixa",
+        header: ({ column }) => (
+          <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Faixa <SortIcon sorted={column.getIsSorted()} />
+          </button>
+        ),
         cell: ({ getValue }) => {
           const cert = getValue()
           return cert
             ? <span className="font-mono text-xs font-bold border border-border rounded px-1.5 py-0.5">{cert}</span>
             : <span className="text-muted-foreground">—</span>
+        },
+        sortingFn: (a, b) => {
+          const order = ["L", "10", "12", "14", "16", "18"]
+          const ia = order.indexOf(a.original.certification ?? "")
+          const ib = order.indexOf(b.original.certification ?? "")
+          const wa = ia === -1 ? order.length : ia
+          const wb = ib === -1 ? order.length : ib
+          return wa - wb
         },
       }),
 
