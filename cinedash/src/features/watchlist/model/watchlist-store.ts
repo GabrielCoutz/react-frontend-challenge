@@ -7,6 +7,7 @@ export interface WatchlistMovie {
   genre_ids: number[]
   release_date: string
   vote_average: number
+  certification?: string
 }
 
 interface WatchlistState {

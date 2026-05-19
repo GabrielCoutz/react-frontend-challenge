@@ -18,6 +18,7 @@ const discoverySearchSchema = z.object({
   genreIds: z.array(z.string()).optional(),
   year: z.number().optional(),
   minRating: z.number().optional(),
+  certification: z.string().optional(),
   personId: z.number().optional(),
   personName: z.string().optional(),
   page: z.number().optional().default(1),

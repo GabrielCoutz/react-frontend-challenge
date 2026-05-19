@@ -22,7 +22,7 @@ import { useDiscover } from "@/entities/movie/api/use-discover";
 import { Button } from "@/components/ui/button";
 
 function hasFilters(f: MovieFilters) {
-  return !!(f.genreIds.length || f.year || f.minRating);
+  return !!(f.genreIds.length || f.year || f.minRating || f.certification);
 }
 
 function Pagination({
@@ -106,6 +106,7 @@ export function DiscoveryPage() {
     genreIds = [],
     year,
     minRating,
+    certification,
     personId,
     personName,
     page = 1,
@@ -113,20 +114,20 @@ export function DiscoveryPage() {
     from: "/_authenticated/discovery",
   });
 
-
-  const filters: MovieFilters = { genreIds, year, minRating };
+  const filters: MovieFilters = { genreIds, year, minRating, certification };
   const isSearching = query.trim().length > 0;
   const isFiltering = hasFilters(filters) || !!personId;
   const activeFiltersCount =
     genreIds.length +
     (year ? 1 : 0) +
     (minRating ? 1 : 0) +
+    (certification ? 1 : 0) +
     (personId ? 1 : 0) +
     (query ? 1 : 0);
 
   const trending = useTrending(page);
   const searchResults = useMovieSearch(query, page);
-  const discover = useDiscover({ page, genreIds, year, minRating, personId });
+  const discover = useDiscover({ page, genreIds, year, minRating, certification, personId });
 
   const active = isSearching
     ? searchResults
@@ -154,6 +155,7 @@ export function DiscoveryPage() {
           genreIds: f.genreIds.length ? f.genreIds : undefined,
           year: f.year,
           minRating: f.minRating,
+          certification: f.certification,
           page: 1,
         }),
       });

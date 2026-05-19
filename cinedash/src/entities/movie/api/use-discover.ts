@@ -7,13 +7,15 @@ interface DiscoverParams {
   year?: number
   minRating?: number
   personId?: number
+  sortBy?: string
+  certification?: string
 }
 
-export function useDiscover({ page = 1, genreIds, year, minRating, personId }: DiscoverParams) {
+export function useDiscover({ page = 1, genreIds, year, minRating, personId, sortBy, certification }: DiscoverParams) {
   const withGenres = genreIds && genreIds.length > 0 ? genreIds.join(',') : undefined
 
   return useQuery({
-    queryKey: ['movies', 'discover', { page, genreIds, year, minRating, personId }],
+    queryKey: ['movies', 'discover', { page, genreIds, year, minRating, personId, sortBy, certification }],
     queryFn: () =>
       tmdbApi.discoverMovies({
         page,
@@ -21,7 +23,10 @@ export function useDiscover({ page = 1, genreIds, year, minRating, personId }: D
         primary_release_year: year,
         'vote_average.gte': minRating,
         with_cast: personId,
+        sort_by: sortBy,
+        certification: certification,
+        certification_country: certification ? 'BR' : undefined,
       }),
-    enabled: !!(withGenres || year || minRating || personId),
+    enabled: !!(withGenres || year || minRating || personId || certification),
   })
 }

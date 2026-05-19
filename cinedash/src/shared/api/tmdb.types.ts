@@ -48,6 +48,29 @@ export interface Person {
   known_for_department: string
 }
 
+export interface Certification {
+  certification: string
+  meaning: string
+  order: number
+}
+
+export interface ReleaseDate {
+  certification: string
+  release_date: string
+  type: number
+}
+
+export interface ReleaseDateResult {
+  iso_3166_1: string
+  release_dates: ReleaseDate[]
+}
+
+export interface MovieWithReleaseDates extends Movie {
+  release_dates?: {
+    results: ReleaseDateResult[]
+  }
+}
+
 export interface CreditsResponse {
   id: number
   cast: Cast[]

@@ -23,6 +23,23 @@ export function MovieDetailsPage() {
   const { add, remove, isInWatchlist } = useWatchlistStore();
   const inWatchlist = movie ? isInWatchlist(movie.id) : false;
 
+  const isLoading = loadingMovie;
+
+  const certification = movie?.release_dates?.results
+    ?.find((r) => r.iso_3166_1 === 'BR')
+    ?.release_dates?.find((d) => d.certification)
+    ?.certification
+
+  useEffect(() => {
+    document.title = movie ? `${movie.title} — CineDash` : 'CineDash'
+    return () => { document.title = 'CineDash' }
+  }, [movie?.title])
+
+  const topCast = credits?.cast.slice(0, 5) ?? [];
+  const trailer = trailers[0];
+  const posterUrl = getImageUrl(movie?.poster_path ?? null, "w500");
+  const backdropUrl = getImageUrl(movie?.backdrop_path ?? null, "original");
+
   const handleWatchlistToggle = () => {
     if (!movie) return;
     if (inWatchlist) {
@@ -37,21 +54,11 @@ export function MovieDetailsPage() {
           : (movie.genres?.map((g) => g.id) ?? []),
         release_date: movie.release_date,
         vote_average: movie.vote_average,
+        certification,
       });
       toast.success(`"${movie.title}" adicionado à lista`);
     }
   };
-
-  const isLoading = loadingMovie;
-
-  useEffect(() => {
-    document.title = movie ? `${movie.title} — CineDash` : 'CineDash'
-    return () => { document.title = 'CineDash' }
-  }, [movie?.title])
-  const topCast = credits?.cast.slice(0, 5) ?? [];
-  const trailer = trailers[0];
-  const posterUrl = getImageUrl(movie?.poster_path ?? null, "w500");
-  const backdropUrl = getImageUrl(movie?.backdrop_path ?? null, "original");
 
   if (isLoading) return <MovieDetailsSkeleton />;
 
@@ -105,6 +112,11 @@ export function MovieDetailsPage() {
                   {movie.vote_average.toFixed(1)}
                 </span>
                 {movie.release_date && <span>{movie.release_date.slice(0, 4)}</span>}
+                {certification && (
+                  <span className="font-mono text-xs font-bold border border-border rounded px-1.5 py-0.5">
+                    {certification}
+                  </span>
+                )}
               </div>
               {movie.genres && (
                 <ul className="flex flex-wrap gap-2" aria-label="Gêneros">

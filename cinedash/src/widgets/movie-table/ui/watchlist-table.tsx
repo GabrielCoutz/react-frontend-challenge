@@ -114,6 +114,16 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
         cell: ({ getValue }) => getValue()?.slice(0, 4) ?? "—",
       }),
 
+      columnHelper.accessor("certification", {
+        header: "Faixa",
+        cell: ({ getValue }) => {
+          const cert = getValue()
+          return cert
+            ? <span className="font-mono text-xs font-bold border border-border rounded px-1.5 py-0.5">{cert}</span>
+            : <span className="text-muted-foreground">—</span>
+        },
+      }),
+
       columnHelper.accessor("vote_average", {
         header: ({ column }) => (
           <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
@@ -181,7 +191,7 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-sm">
+              <div className="grid grid-cols-4 gap-2 text-sm">
                 <div className="space-y-0.5">
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Gênero</p>
                   <Badge variant="secondary" className="text-xs">{genreName}</Badge>
@@ -189,6 +199,12 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
                 <div className="space-y-0.5">
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Ano</p>
                   <p className="text-sm">{movie.release_date?.slice(0, 4) ?? "—"}</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Faixa</p>
+                  {movie.certification
+                    ? <span className="font-mono text-xs font-bold border border-border rounded px-1 py-0.5">{movie.certification}</span>
+                    : <span className="text-sm text-muted-foreground">—</span>}
                 </div>
                 <div className="space-y-0.5">
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Rating</p>

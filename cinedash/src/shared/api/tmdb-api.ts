@@ -1,7 +1,9 @@
 import type {
   Genre,
   Movie,
+  MovieWithReleaseDates,
   Person,
+  Certification,
   PaginatedResponse,
   CreditsResponse,
   VideosResponse,
@@ -28,9 +30,18 @@ export const tmdbApi = {
     return data;
   },
 
-  getMovie: async (id: number): Promise<Movie> => {
-    const { data } = await tmdbClient.get<Movie>(`/movie/${id}`);
+  getMovie: async (id: number): Promise<MovieWithReleaseDates> => {
+    const { data } = await tmdbClient.get<MovieWithReleaseDates>(`/movie/${id}`, {
+      params: { append_to_response: 'release_dates' },
+    });
     return data;
+  },
+
+  getCertifications: async (): Promise<Record<string, Certification[]>> => {
+    const { data } = await tmdbClient.get<{ certifications: Record<string, Certification[]> }>(
+      '/certification/movie/list',
+    );
+    return data.certifications;
   },
 
   getCredits: async (id: number): Promise<CreditsResponse> => {
@@ -60,6 +71,9 @@ export const tmdbApi = {
     primary_release_year?: number;
     "vote_average.gte"?: number;
     with_cast?: number;
+    sort_by?: string;
+    certification?: string;
+    certification_country?: string;
   }): Promise<PaginatedResponse<Movie>> => {
     const { data } = await tmdbClient.get<PaginatedResponse<Movie>>(
       "/discover/movie",

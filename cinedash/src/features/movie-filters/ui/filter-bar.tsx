@@ -14,6 +14,7 @@ import { Slider } from '@/components/ui/slider'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGenres } from '@/entities/movie/api/use-genres'
+import { useCertifications } from '@/entities/movie/api/use-certifications'
 import { usePersonSearch } from '@/entities/movie/api/use-person-search'
 import { useDebounce } from '@/shared/hooks/use-debounce'
 import { getImageUrl } from '@/shared/api/tmdb-client'
@@ -24,6 +25,7 @@ export interface MovieFilters {
   genreIds: string[]
   year: number | undefined
   minRating: number | undefined
+  certification: string | undefined
 }
 
 interface FilterBarProps {
@@ -37,7 +39,7 @@ interface FilterBarProps {
 
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i)
-const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined }
+const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined, certification: undefined }
 
 export function FilterBar({ filters, onChange, sidebar = false, personId, personName, onPersonChange }: FilterBarProps) {
   const [genreOpen, setGenreOpen] = useState(false)
@@ -59,7 +61,10 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
     if (personError) toast.error('Falha ao buscar pessoas. Tente novamente.')
   }, [personError])
 
-  const hasActiveFilters = filters.genreIds.length > 0 || !!filters.year || !!filters.minRating || !!personId
+  const [certOpen, setCertOpen] = useState(false)
+  const { data: certifications = [] } = useCertifications(certOpen)
+
+  const hasActiveFilters = filters.genreIds.length > 0 || !!filters.year || !!filters.minRating || !!filters.certification || !!personId
 
   const toggleGenre = (id: string) => {
     setPendingIds((prev) =>
@@ -278,6 +283,28 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
           <SelectItem value="clear">Qualquer ano</SelectItem>
           {YEARS.map((y) => (
             <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Classificação indicativa */}
+      <Select
+        open={certOpen}
+        onOpenChange={setCertOpen}
+        value={filters.certification ?? undefined}
+        onValueChange={(v) => onChange({ ...filters, certification: v === 'all' || !v ? undefined : v })}
+      >
+        <SelectTrigger className={sidebar ? 'w-full' : 'w-40'}>
+          <SelectValue placeholder="Classificação">
+            {filters.certification ?? undefined}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Qualquer classificação</SelectItem>
+          {certifications.map((c) => (
+            <SelectItem key={c.certification} value={c.certification}>
+              {c.certification}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
