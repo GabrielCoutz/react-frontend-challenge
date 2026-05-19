@@ -109,8 +109,16 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
       }),
 
       columnHelper.accessor("release_date", {
-        header: "Data",
-        cell: ({ getValue }) => getValue()?.slice(0, 4) ?? "—",
+        header: "Lançamento",
+        cell: ({ getValue }) => {
+          const val = getValue()
+          if (!val) return "—"
+          return new Date(val + "T00:00:00").toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })
+        },
       }),
 
       columnHelper.accessor("certification", {
@@ -196,8 +204,12 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
                   <Badge variant="secondary" className="text-xs">{genreName}</Badge>
                 </div>
                 <div className="space-y-0.5">
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Ano</p>
-                  <p className="text-sm">{movie.release_date?.slice(0, 4) ?? "—"}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Lançamento</p>
+                  <p className="text-sm">
+                    {movie.release_date
+                      ? new Date(movie.release_date + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })
+                      : "—"}
+                  </p>
                 </div>
                 <div className="space-y-0.5">
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Faixa</p>
