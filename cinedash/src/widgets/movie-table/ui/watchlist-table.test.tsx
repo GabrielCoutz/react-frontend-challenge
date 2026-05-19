@@ -36,11 +36,11 @@ describe('WatchlistTable', () => {
 
   it('renderiza os headers da tabela desktop', () => {
     renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
-    // desktop table headers (buttons com sort icon)
     expect(screen.getByRole('button', { name: /título/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /gênero/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /lançamento/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /faixa/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /rating/i })).toBeInTheDocument()
-    expect(screen.getByText('Data')).toBeInTheDocument()
     expect(screen.getByText('Ações')).toBeInTheDocument()
   })
 
@@ -87,5 +87,29 @@ describe('WatchlistTable', () => {
     await userEvent.click(ratingHeader)
     const rows = screen.getAllByRole('row').slice(1)
     expect(within(rows[0]!).getByText('6.5')).toBeInTheDocument()
+  })
+
+  it('ordena por data de lançamento crescente ao clicar no header Lançamento', async () => {
+    renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    const dateHeader = screen.getByRole('button', { name: /lançamento/i })
+    await userEvent.click(dateHeader)
+    const rows = screen.getAllByRole('row').slice(1)
+    // 2021 < 2023 < 2024 — Duna primeiro, Alien último
+    expect(within(rows[0]!).getAllByText(/duna/i)[0]).toBeInTheDocument()
+    expect(within(rows[2]!).getAllByText(/alien/i)[0]).toBeInTheDocument()
+  })
+
+  it('ordena por faixa etária usando mapa de pesos semântico', async () => {
+    const moviesWithCert: WatchlistMovie[] = [
+      makeMovie({ id: 1, title: 'Filme 18', certification: '18' }),
+      makeMovie({ id: 2, title: 'Filme L', certification: 'L' }),
+      makeMovie({ id: 3, title: 'Filme 12', certification: '12' }),
+    ]
+    renderWithProviders(<WatchlistTable movies={moviesWithCert} onRemove={onRemove} />)
+    const certHeader = screen.getByRole('button', { name: /faixa/i })
+    await userEvent.click(certHeader) // asc: L → 12 → 18
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(within(rows[0]!).getAllByText(/filme l/i)[0]).toBeInTheDocument()
+    expect(within(rows[2]!).getAllByText(/filme 18/i)[0]).toBeInTheDocument()
   })
 })
