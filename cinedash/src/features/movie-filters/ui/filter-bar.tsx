@@ -52,8 +52,12 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
   const [pendingIds, setPendingIds] = useState<string[]>(filters.genreIds)
   const [ratingDisplay, setRatingDisplay] = useState(filters.minRating ?? 0)
 
-  // Sincroniza estados locais quando os valores da URL mudam externamente (ex: reload, back/forward)
+  // Syncs local pending state when URL params change externally (reload, browser back/forward).
+  // setState-in-effect is intentional here: this is the recommended React pattern for resetting
+  // derived state when a prop/external value changes (react.dev/learn/you-might-not-need-an-effect).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setPendingIds(filters.genreIds) }, [filters.genreIds])
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setRatingDisplay(filters.minRating ?? 0) }, [filters.minRating])
 
   const debouncedPersonQuery = useDebounce(personQuery, 400)

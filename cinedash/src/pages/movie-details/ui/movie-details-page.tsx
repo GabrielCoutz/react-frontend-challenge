@@ -31,7 +31,7 @@ export function MovieDetailsPage() {
   useEffect(() => {
     document.title = movie ? `${movie.title} — CineDash` : 'CineDash'
     return () => { document.title = 'CineDash' }
-  }, [movie?.title])
+  }, [movie])
 
   const topCast = credits?.cast.slice(0, 5) ?? [];
   const trailer = trailers[0];
