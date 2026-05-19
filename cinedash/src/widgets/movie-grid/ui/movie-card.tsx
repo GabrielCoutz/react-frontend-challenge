@@ -18,9 +18,7 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
   const { add, remove, isInWatchlist } = useWatchlistStore()
   const inWatchlist = isInWatchlist(movie.id)
 
-  const imageUrl = movie.backdrop_path
-    ? getImageUrl(movie.backdrop_path, 'w780')
-    : getImageUrl(movie.poster_path, 'w500')
+  const imageUrl = getImageUrl(movie.backdrop_path, 'w780')
 
   const year = movie.release_date?.slice(0, 4)
   const movieGenres = genres.filter((g) => movie.genre_ids.includes(g.id)).slice(0, 2)

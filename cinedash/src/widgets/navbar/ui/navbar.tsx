@@ -12,6 +12,7 @@ export function Navbar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   const handleLogout = () => {
+    useWatchlistStore.setState({ movies: [] })
     logout()
     navigate({ to: '/' })
   }
