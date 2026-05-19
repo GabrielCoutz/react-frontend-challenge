@@ -47,16 +47,16 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
       params={{ id: String(movie.id) }}
       aria-label={`Ver detalhes de ${movie.title}`}
     >
-      <Card className="group overflow-hidden hover:ring-2 hover:ring-primary transition-all cursor-pointer flex flex-col h-full">
-        <div className="aspect-video relative bg-muted">
+      <Card className="group hover:ring-2 hover:ring-primary transition-all cursor-pointer flex flex-col h-full">
+        <div className="aspect-video relative bg-muted overflow-hidden rounded-t-[inherit]">
           <Image src={imageUrl} alt={movie.title} className="w-full h-full object-cover" />
 
           <button
             onClick={handleWatchlist}
-            className={`absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full border transition-all cursor-pointer ${
+            className={`absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border transition-all cursor-pointer ${
               inWatchlist
-                ? 'bg-primary border-primary text-primary-foreground opacity-100'
-                : 'bg-background/80 border-border text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground backdrop-blur-sm opacity-0 group-hover:opacity-100'
+                ? 'bg-primary border-primary text-primary-foreground'
+                : 'bg-background/80 border-border text-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100'
             }`}
             aria-label={inWatchlist ? `Remover ${movie.title} da lista` : `Adicionar ${movie.title} à lista`}
             aria-pressed={inWatchlist}
