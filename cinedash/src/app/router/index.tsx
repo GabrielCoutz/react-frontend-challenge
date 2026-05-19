@@ -8,10 +8,7 @@ import {
 import { z } from "zod";
 import { useAuthStore } from "@/entities/user";
 import { AuthenticatedLayout } from "@/app/layouts/authenticated-layout";
-import { LoginPage } from "@/pages/login/ui/login-page";
-import { DiscoveryPage } from "@/pages/discovery/ui/discovery-page";
-import { MovieDetailsPage } from "@/pages/movie-details/ui/movie-details-page";
-import { WatchlistPage } from "@/pages/watchlist/ui/watchlist-page";
+import { LoginPage, DiscoveryPage, MovieDetailsPage, WatchlistPage } from "./lazy-pages";
 
 const discoverySearchSchema = z.object({
   query: z.string().optional(),
