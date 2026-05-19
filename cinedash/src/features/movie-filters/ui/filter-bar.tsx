@@ -29,6 +29,7 @@ export interface MovieFilters {
 }
 
 interface FilterBarProps {
+  onClearQuery?: () => void
   filters: MovieFilters
   onChange: (filters: MovieFilters) => void
   sidebar?: boolean
@@ -41,7 +42,7 @@ const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i)
 const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined, certification: undefined }
 
-export function FilterBar({ filters, onChange, sidebar = false, personId, personName, onPersonChange }: FilterBarProps) {
+export function FilterBar({ filters, onChange, sidebar = false, personId, personName, onPersonChange, onClearQuery }: FilterBarProps) {
   const [genreOpen, setGenreOpen] = useState(false)
   const { data: genres = [], isLoading: genresLoading, isError: genresError, refetch: refetchGenres } = useGenres(genreOpen)
 
@@ -89,6 +90,7 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
     setRatingDisplay(0)
     onChange(EMPTY_FILTERS)
     onPersonChange?.(undefined, undefined)
+    onClearQuery?.()
   }
 
   const genreLabel = () => {
@@ -273,6 +275,7 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
 
       {/* Ano */}
       <Select
+        key={`year-${filters.year ?? 'none'}`}
         value={filters.year ? String(filters.year) : undefined}
         onValueChange={(v) => onChange({ ...filters, year: v === 'clear' || !v ? undefined : Number(v) })}
       >
@@ -289,6 +292,7 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
 
       {/* Classificação indicativa */}
       <Select
+        key={`cert-${filters.certification ?? 'none'}`}
         open={certOpen}
         onOpenChange={setCertOpen}
         value={filters.certification ?? undefined}

@@ -84,7 +84,7 @@ function FilterSidebarContent({
       <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-1">
         Filtros
       </p>
-      <SearchInput onSearch={onSearch} initialValue={query} />
+      <SearchInput onSearch={onSearch} initialValue={query} key={query || 'empty'} />
       <FilterBar
         filters={filters}
         onChange={onFilters}
@@ -92,6 +92,7 @@ function FilterSidebarContent({
         personId={personId}
         personName={personName}
         onPersonChange={onPersonChange}
+        onClearQuery={() => onSearch('')}
       />
     </div>
   );
