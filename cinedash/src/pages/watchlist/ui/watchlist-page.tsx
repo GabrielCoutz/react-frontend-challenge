@@ -7,7 +7,7 @@ import { FilterBar, type MovieFilters } from '@/features/movie-filters'
 import { Input } from '@/shared/ui/input'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/shared/ui/sheet'
 
-const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined }
+const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined, certification: undefined }
 
 export function WatchlistPage() {
   usePageTitle('Minha Lista')

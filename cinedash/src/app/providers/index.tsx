@@ -21,7 +21,7 @@ export function Providers({ children }: ProvidersProps) {
     <QueryClientProvider client={queryClient}>
       {children}
       <Toaster richColors position="top-right" />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }

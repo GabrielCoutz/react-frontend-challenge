@@ -165,7 +165,7 @@ describe('useDiscoveryFilters', () => {
       const { result } = renderHook(() => useDiscoveryFilters())
       result.current.handleSearch('interstellar')
       expect(mockNavigate).toHaveBeenCalledOnce()
-      const call = mockNavigate.mock.calls[0][0]
+      const call = mockNavigate.mock.calls[0]![0]
       const nextSearch = call.search({ page: 3, query: 'old' })
       expect(nextSearch.query).toBe('interstellar')
       expect(nextSearch.page).toBe(1)
@@ -175,7 +175,7 @@ describe('useDiscoveryFilters', () => {
       mockSearchParams = {}
       const { result } = renderHook(() => useDiscoveryFilters())
       result.current.handleSearch('')
-      const call = mockNavigate.mock.calls[0][0]
+      const call = mockNavigate.mock.calls[0]![0]
       const nextSearch = call.search({})
       expect(nextSearch.query).toBeUndefined()
     })
@@ -184,7 +184,7 @@ describe('useDiscoveryFilters', () => {
       mockSearchParams = {}
       const { result } = renderHook(() => useDiscoveryFilters())
       result.current.handlePage(4)
-      const call = mockNavigate.mock.calls[0][0]
+      const call = mockNavigate.mock.calls[0]![0]
       const nextSearch = call.search({ query: 'batman', page: 1 })
       expect(nextSearch.page).toBe(4)
       expect(nextSearch.query).toBe('batman')
@@ -194,7 +194,7 @@ describe('useDiscoveryFilters', () => {
       mockSearchParams = { page: 5 }
       const { result } = renderHook(() => useDiscoveryFilters())
       result.current.handleFilters({ genreIds: ['28'], year: undefined, minRating: undefined, certification: undefined })
-      const call = mockNavigate.mock.calls[0][0]
+      const call = mockNavigate.mock.calls[0]![0]
       const nextSearch = call.search({ page: 5 })
       expect(nextSearch.page).toBe(1)
     })
@@ -203,7 +203,7 @@ describe('useDiscoveryFilters', () => {
       mockSearchParams = {}
       const { result } = renderHook(() => useDiscoveryFilters())
       result.current.handleFilters({ genreIds: [], year: undefined, minRating: undefined, certification: undefined })
-      const call = mockNavigate.mock.calls[0][0]
+      const call = mockNavigate.mock.calls[0]![0]
       const nextSearch = call.search({})
       expect(nextSearch.genreIds).toBeUndefined()
     })
@@ -212,7 +212,7 @@ describe('useDiscoveryFilters', () => {
       mockSearchParams = { page: 2 }
       const { result } = renderHook(() => useDiscoveryFilters())
       result.current.handlePersonChange(123, 'Keanu Reeves')
-      const call = mockNavigate.mock.calls[0][0]
+      const call = mockNavigate.mock.calls[0]![0]
       const nextSearch = call.search({ page: 2 })
       expect(nextSearch.personId).toBe(123)
       expect(nextSearch.personName).toBe('Keanu Reeves')

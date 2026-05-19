@@ -48,6 +48,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
         <Input
           type="email"
           placeholder="Email"
+          autoComplete="email"
           {...register("email")}
           aria-label="Email"
           aria-invalid={!!errors.email}
@@ -65,6 +66,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           <Input
             type={showPassword ? "text" : "password"}
             placeholder="Senha"
+            autoComplete="current-password"
             {...register("password")}
             aria-label="Senha"
             aria-invalid={!!errors.password}

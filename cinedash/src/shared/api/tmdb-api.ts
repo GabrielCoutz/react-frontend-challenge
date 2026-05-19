@@ -19,6 +19,38 @@ export const tmdbApi = {
     return data;
   },
 
+  getPopular: async (page = 1): Promise<PaginatedResponse<Movie>> => {
+    const { data } = await tmdbClient.get<PaginatedResponse<Movie>>(
+      "/movie/popular",
+      { params: { page } },
+    );
+    return data;
+  },
+
+  getTopRated: async (page = 1): Promise<PaginatedResponse<Movie>> => {
+    const { data } = await tmdbClient.get<PaginatedResponse<Movie>>(
+      "/movie/top_rated",
+      { params: { page } },
+    );
+    return data;
+  },
+
+  getNowPlaying: async (page = 1): Promise<PaginatedResponse<Movie>> => {
+    const { data } = await tmdbClient.get<PaginatedResponse<Movie>>(
+      "/movie/now_playing",
+      { params: { page } },
+    );
+    return data;
+  },
+
+  getUpcoming: async (page = 1): Promise<PaginatedResponse<Movie>> => {
+    const { data } = await tmdbClient.get<PaginatedResponse<Movie>>(
+      "/movie/upcoming",
+      { params: { page } },
+    );
+    return data;
+  },
+
   searchMovies: async (
     query: string,
     page = 1,
@@ -71,7 +103,7 @@ export const tmdbApi = {
     primary_release_year?: number;
     "vote_average.gte"?: number;
     with_cast?: number;
-    sort_by?: string;
+    sort_by?: 'popularity.asc' | 'popularity.desc' | 'vote_average.asc' | 'vote_average.desc' | 'primary_release_date.asc' | 'primary_release_date.desc' | 'revenue.asc' | 'revenue.desc' | 'original_title.asc' | 'original_title.desc';
     certification?: string;
     certification_country?: string;
   }): Promise<PaginatedResponse<Movie>> => {

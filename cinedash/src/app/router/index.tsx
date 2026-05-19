@@ -20,7 +20,7 @@ const discoverySearchSchema = z.object({
   minRating: z.number().optional(),
   certification: z.string().optional(),
   personId: z.number().optional(),
-  personName: z.string().optional(),
+  personName: z.string().max(100).optional(),
   page: z.number().optional().default(1),
 });
 

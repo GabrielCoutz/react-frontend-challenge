@@ -4,9 +4,17 @@ import './index.css'
 import App from './App'
 
 // Aplica tema antes do primeiro render para evitar flash
-const stored = localStorage.getItem('theme-storage')
-const theme = stored ? (JSON.parse(stored)?.state?.theme ?? 'dark') : 'dark'
-document.documentElement.classList.add(theme)
+function getInitialTheme(): 'dark' | 'light' {
+  try {
+    const raw = localStorage.getItem('theme-storage')
+    const parsed = raw ? JSON.parse(raw) : null
+    const theme = parsed?.state?.theme
+    return theme === 'dark' || theme === 'light' ? theme : 'dark'
+  } catch {
+    return 'dark'
+  }
+}
+document.documentElement.classList.add(getInitialTheme())
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

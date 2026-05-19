@@ -1,32 +1,21 @@
 import { describe, expect, it } from 'vitest'
 import { generateAuthToken } from '.'
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 describe('generateAuthToken', () => {
   it('retorna uma string não vazia', () => {
     expect(typeof generateAuthToken()).toBe('string')
     expect(generateAuthToken().length).toBeGreaterThan(0)
   })
 
-  it('retorna apenas caracteres base36 válidos', () => {
-    expect(generateAuthToken()).toMatch(/^[0-9a-z]+$/)
+  it('retorna um UUID v4 válido', () => {
+    expect(generateAuthToken()).toMatch(UUID_REGEX)
   })
 
   it('gera tokens diferentes em chamadas consecutivas', () => {
     const a = generateAuthToken()
-    // força diferença de timestamp com delay via Date mock
     const b = generateAuthToken()
-    // tokens gerados em milissegundos distintos devem ser diferentes;
-    // em execução síncrona podem coincidir — validamos pelo menos o formato
-    expect(typeof a).toBe('string')
-    expect(typeof b).toBe('string')
-  })
-
-  it('token corresponde ao timestamp atual em base36', () => {
-    const before = Date.now()
-    const token = generateAuthToken()
-    const after = Date.now()
-    const tokenAsNumber = parseInt(token, 36)
-    expect(tokenAsNumber).toBeGreaterThanOrEqual(before)
-    expect(tokenAsNumber).toBeLessThanOrEqual(after)
+    expect(a).not.toBe(b)
   })
 })

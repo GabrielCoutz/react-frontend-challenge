@@ -12,7 +12,7 @@ import { Image } from "@/shared/ui/image";
 
 export function MovieDetailsPage() {
   const { id } = useParams({ from: "/_authenticated/movie/$id" });
-  const movieId = Number(id);
+  const movieId = parseInt(id, 10);
 
   const { data: movie, isLoading: loadingMovie, isError: errorMovie } = useMovie(movieId);
   const { data: credits, isLoading: loadingCredits, isError: errorCredits, refetch: refetchCredits } = useCredits(movieId);
@@ -215,12 +215,13 @@ export function MovieDetailsPage() {
             </div>
           ) : loadingVideos ? (
             <Skeleton className="aspect-video w-full rounded-lg" />
-          ) : trailer ? (
+          ) : trailer && /^[A-Za-z0-9_-]{11}$/.test(trailer.key) ? (
             <div className="aspect-video w-full rounded-lg overflow-hidden">
               <iframe
                 src={`https://www.youtube.com/embed/${trailer.key}`}
                 title={trailer.name}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
                 allowFullScreen
                 className="w-full h-full"
               />
