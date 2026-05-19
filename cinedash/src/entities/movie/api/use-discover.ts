@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { tmdbApi } from '@/shared/api/tmdb-api'
 
-export const VALID_SORT_BY = [
+const VALID_SORT_BY = [
   'popularity.asc', 'popularity.desc',
   'vote_average.asc', 'vote_average.desc',
   'primary_release_date.asc', 'primary_release_date.desc',
@@ -9,7 +9,6 @@ export const VALID_SORT_BY = [
   'original_title.asc', 'original_title.desc',
 ] as const
 
-export type SortBy = typeof VALID_SORT_BY[number]
 
 interface DiscoverParams {
   page?: number
