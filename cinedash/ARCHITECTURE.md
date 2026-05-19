@@ -66,7 +66,7 @@ O TanStack Router protege rotas via `beforeLoad` no layout route `_authenticated
 
 ### Design de referência (Figma)
 
-O projeto tem um arquivo Figma com style guide, tokens de cor e as principais telas. Ele serviu como **referência visual**, não como especificação pixel-perfect — pequenas divergências de espaçamento e animação são intencionais no código final. Hover, focus, loading states e breakpoints intermediários estão definidos exclusivamente no código.
+O projeto conta com um arquivo Figma documentando o style guide, tokens de cor e as principais telas. Ele funciona como **referência visual** — hover, focus, loading states e breakpoints intermediários estão definidos no código, não no Figma, pois são comportamentos de interação que ferramentas de design não capturam bem.
 
 [CineDash — UI Design](https://www.figma.com/design/x6EvQ28RvxVA1bBx8UFD7D/CineDash-%E2%80%94-UI-Design)
 
@@ -74,48 +74,41 @@ O projeto tem um arquivo Figma com style guide, tokens de cor e as principais te
 
 ### Acessibilidade
 
-Dashboards internos frequentemente ignoram acessibilidade por assumir que "o usuário é técnico". Isso exclui pessoas com deficiência visual e prejudica navegação por teclado em workflows repetitivos de curadoria — exatamente o caso de uso desta aplicação.
+Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar, adicionar à lista, repetir. Interfaces que dependem exclusivamente do mouse introduzem fricção real no workflow e excluem usuários com deficiência motora ou visual. Por isso o projeto foi construído com conformidade WCAG 2.1 nível AAA e WAI-ARIA desde o início, não como ajuste posterior:
 
-Implementei conformidade com WCAG 2.1 nível AAA e WAI-ARIA, resultando em uma interface utilizável por leitores de tela, navegação por teclado e contraste elevado:
+- **Navegação por teclado completa** com skip-nav link e landmarks semânticos (`<main>`, `<nav aria-label>`, `<aside>`, `<section>`)
+- **Formulário de login** com `aria-invalid`, `aria-describedby` em erros e `autoComplete` correto — compatível com gerenciadores de senha e leitores de tela
+- **Grid de filmes** com `aria-live="polite"` — transições de loading/empty/error anunciadas sem interromper o fluxo de leitura
+- **Tabela da watchlist** com `aria-sort` nas colunas ordenáveis; mobile usa `<ul>/<li>` semânticos
+- **Botões com contexto completo** — `aria-label="Adicionar Inception à watchlist"` em vez de `"Adicionar"`, eliminando ambiguidade para leitores de tela
+- **Paleta verificada contra WCAG 2.1 SC 1.4.6 (Contrast Enhanced, Level AAA):**
 
-- **Landmarks semânticos:** `<main>`, `<nav aria-label>`, `<aside>`, `<section>` com skip-nav link para pular ao conteúdo principal
-- **Formulário de login:** `aria-invalid`, `aria-describedby` nos erros, `autoComplete="email"` e `autoComplete="current-password"` para compatibilidade com gerenciadores de senha
-- **Grid de filmes:** `aria-live="polite"` nos estados de loading/empty/error — leitores de tela anunciam mudanças sem interrupção
-- **Tabela da watchlist:** `aria-sort` nas colunas ordenáveis; layout mobile usa `<ul>/<li>` semânticos em vez de `<div>`s genéricos
-- **Botões contextuais:** `aria-label` inclui o título do filme (`"Adicionar Inception à watchlist"`) em vez de apenas `"Adicionar"`
-- **Contraste WCAG AAA verificado:**
-
-| Token | Dark | Light |
-|-------|------|-------|
-| Texto principal | 19:1 ✅ | 20:1 ✅ |
+| Token            | Dark     | Light    |
+| ---------------- | -------- | -------- |
+| Texto principal  | 19:1 ✅  | 20:1 ✅  |
 | Texto secundário | 7.0:1 ✅ | 7.0:1 ✅ |
-| Primary (ações) | 5.9:1 ✅ | 7.6:1 ✅ |
-| Bordas / UI | 3.3:1 ✅ | 3.2:1 ✅ |
+| Primary (ações)  | 5.9:1 ✅ | 7.6:1 ✅ |
+| Bordas / UI      | 3.3:1 ✅ | 3.2:1 ✅ |
 
 ---
 
 ### Segurança
 
-Aplicações frontend raramente passam por revisão de segurança formal. Identifiquei e corrigi 14 vulnerabilidades categorizadas por severidade, endurecendo a aplicação contra os vetores de ataque mais comuns em SPAs:
+SPAs têm uma superfície de ataque específica que raramente aparece em checklists de code review: credenciais em URLs, dados sensíveis em `localStorage`, inputs externos não sanitizados e ausência de política de conteúdo. O projeto foi auditado contra esses vetores e endurecido em quatro frentes:
 
-**Tokens e autenticação**
-- `generateAuthToken()` migrado de timestamp base-36 (zero entropia, previsível por força bruta) para `crypto.randomUUID()` — token criptograficamente aleatório com 122 bits de entropia
-- Tema lido do `localStorage` no boot passou a usar `try/catch` + allowlist `['dark', 'light']` — JSON corrompido não mais trava a aplicação antes do React montar
+**Tokens e credenciais**
+- Autenticação usa `crypto.randomUUID()` — 122 bits de entropia, não previsível
+- Credencial da API TMDB trafega exclusivamente via `Authorization: Bearer` header, nunca em query params (onde apareceria em logs de servidor, proxies e ferramentas de APM)
 
-**Transporte de credenciais**
-- API key removida dos query params (visível em logs de servidor, proxies e Sentry) e substituída por `Authorization: Bearer` header — credencial nunca aparece em URLs
+**Política de conteúdo**
+- `Content-Security-Policy` restringindo scripts, conexões e frames a origens explicitamente permitidas (TMDB, YouTube)
+- `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` e `Permissions-Policy` bloqueando câmera, microfone e geolocalização
 
-**Headers de segurança (dev server)**
-- `Content-Security-Policy` restringindo scripts, frames e conexões a origens explicitamente permitidas (TMDB, YouTube)
-- `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` desabilitando câmera/microfone/geolocalização
-
-**Validação de inputs externos**
-- `trailer.key` da API TMDB validado contra `/^[A-Za-z0-9_-]{11}$/` antes de compor a URL do iframe
-- `sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"` no iframe do YouTube
-- `sort_by` passa por allowlist de valores TMDB válidos — strings arbitrárias são descartadas em runtime
-- `personName` limitado a 100 caracteres no schema Zod da URL
-- `parseInt(id, 10)` substituiu `Number(id)` — elimina `NaN`, `Infinity` e strings arbitrárias como IDs de filme
+**Validação de dados externos**
+- Chave de vídeo da API TMDB validada contra `/^[A-Za-z0-9_-]{11}$/` antes de compor URL de iframe; iframe do YouTube com atributo `sandbox` explícito
+- Parâmetros de URL (`personName`, `sort_by`, `id`) validados com tipos estritos e allowlists — strings arbitrárias são descartadas antes de chegar à API
+- Leitura do `localStorage` no boot envolta em `try/catch` com allowlist de valores válidos — JSON corrompido não trava a aplicação
 
 **Ferramentas**
-- `ReactQueryDevtools` protegido por `import.meta.env.DEV` — dados de cache nunca expostos em produção
-- `eslint-plugin-security` adicionado ao pipeline de lint — padrões inseguros (`eval`, object injection, regex não-literal) são flagados automaticamente
+- `ReactQueryDevtools` protegido por `import.meta.env.DEV` — cache de queries nunca exposto em produção
+- `eslint-plugin-security` no pipeline de lint — padrões inseguros são flagados em tempo de desenvolvimento
