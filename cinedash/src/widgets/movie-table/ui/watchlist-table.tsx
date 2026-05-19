@@ -84,7 +84,7 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
           </button>
         ),
         cell: ({ row }) => (
-          <Link to="/movie/$id" params={{ id: String(row.original.id) }} className="font-medium hover:underline line-clamp-1">
+          <Link to="/movie/$id" params={{ id: String(row.original.id) }} title={row.original.title} className="font-medium hover:underline line-clamp-1">
             {row.original.title}
           </Link>
         ),

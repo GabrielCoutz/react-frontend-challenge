@@ -47,7 +47,7 @@ export function MovieCard({ movie, genres = [] }: MovieCardProps) {
       params={{ id: String(movie.id) }}
       aria-label={`Ver detalhes de ${movie.title}`}
     >
-      <Card className="group hover:ring-2 hover:ring-primary transition-all cursor-pointer flex flex-col h-full">
+      <Card title={movie.title} className="group hover:ring-2 hover:ring-primary transition-all cursor-pointer flex flex-col h-full">
         <div className="aspect-video relative bg-muted overflow-hidden rounded-t-[inherit]">
           <Image src={imageUrl} alt={movie.title} className="w-full h-full object-cover" />
 
