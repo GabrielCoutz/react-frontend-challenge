@@ -54,6 +54,10 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
   const [pendingIds, setPendingIds] = useState<string[]>(filters.genreIds)
   const [ratingDisplay, setRatingDisplay] = useState(filters.minRating ?? 0)
 
+  // Sincroniza estados locais quando os valores da URL mudam externamente (ex: reload, back/forward)
+  useEffect(() => { setPendingIds(filters.genreIds) }, [filters.genreIds])
+  useEffect(() => { setRatingDisplay(filters.minRating ?? 0) }, [filters.minRating])
+
   const debouncedPersonQuery = useDebounce(personQuery, 400)
   const { data: personResults, isLoading: personLoading, isError: personError } = usePersonSearch(debouncedPersonQuery)
   const people = personResults?.results.slice(0, 6) ?? []
@@ -253,10 +257,11 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
         </PopoverContent>
       </Popover>
 
-      {sidebar && filters.genreIds.length > 0 && (
+      {sidebar && filters.genreIds.length > 0 && genres.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {filters.genreIds.map((id) => {
             const name = genres.find((g) => String(g.id) === id)?.name
+            if (!name) return null
             return (
               <Badge key={id} variant="secondary" className="text-xs gap-1 pr-1">
                 {name}
