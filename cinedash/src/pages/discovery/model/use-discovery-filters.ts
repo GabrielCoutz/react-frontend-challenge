@@ -1,0 +1,99 @@
+import { useCallback } from 'react'
+import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useSearch as useMovieSearch } from '@/entities/movie/api/use-search'
+import { useTrending } from '@/entities/movie/api/use-trending'
+import { useDiscover } from '@/entities/movie/api/use-discover'
+import type { MovieFilters } from '@/features/movie-filters/ui/filter-bar'
+
+function hasFilters(f: MovieFilters) {
+  return !!(f.genreIds.length || f.year || f.minRating || f.certification)
+}
+
+export function useDiscoveryFilters() {
+  const navigate = useNavigate({ from: '/discovery' })
+
+  const {
+    query = '',
+    genreIds = [],
+    year,
+    minRating,
+    certification,
+    personId,
+    personName,
+    page = 1,
+  } = useSearch({ from: '/_authenticated/discovery' })
+
+  const filters: MovieFilters = { genreIds, year, minRating, certification }
+  const isSearching = query.trim().length > 0
+  const isFiltering = hasFilters(filters) || !!personId
+
+  const trending = useTrending(page)
+  const searchResults = useMovieSearch(query, page)
+  const discover = useDiscover({ page, genreIds, year, minRating, certification, personId })
+
+  const active = isSearching ? searchResults : isFiltering ? discover : trending
+  const movies = active.data?.results ?? []
+  const totalPages = active.data?.total_pages ?? 1
+
+  const sectionTitle = isSearching
+    ? `Resultados para "${query}"`
+    : personId
+      ? `Filmes com ${personName ?? '...'}`
+      : isFiltering
+        ? 'Filmes filtrados'
+        : 'Trending Esta Semana'
+
+  const activeFiltersCount =
+    genreIds.length +
+    (year ? 1 : 0) +
+    (minRating ? 1 : 0) +
+    (certification ? 1 : 0) +
+    (personId ? 1 : 0) +
+    (query ? 1 : 0)
+
+  const handleSearch = useCallback((q: string) => {
+    navigate({ search: (prev) => ({ ...prev, query: q || undefined, page: 1 }) })
+  }, [navigate])
+
+  const handleFilters = useCallback((f: MovieFilters) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        genreIds: f.genreIds.length ? f.genreIds : undefined,
+        year: f.year,
+        minRating: f.minRating,
+        certification: f.certification,
+        page: 1,
+      }),
+    })
+  }, [navigate])
+
+  const handlePersonChange = useCallback((id: number | undefined, name: string | undefined) => {
+    navigate({ search: (prev) => ({ ...prev, personId: id, personName: name, page: 1 }) })
+  }, [navigate])
+
+  const handlePage = useCallback((next: number) => {
+    navigate({ search: (prev) => ({ ...prev, page: next }) })
+  }, [navigate])
+
+  const handleRetry = useCallback(() => { void active.refetch() }, [active])
+
+  return {
+    query,
+    filters,
+    personId,
+    personName,
+    page,
+    movies,
+    totalPages,
+    sectionTitle,
+    activeFiltersCount,
+    isLoading: active.isLoading,
+    isError: active.isError,
+    handleSearch,
+    handleFilters,
+    handlePersonChange,
+    handlePage,
+    handleRetry,
+  }
+}
