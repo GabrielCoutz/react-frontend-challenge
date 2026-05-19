@@ -1,9 +1,7 @@
 import { useCallback } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useSearch as useMovieSearch } from '@/entities/movie/api/use-search'
-import { useTrending } from '@/entities/movie/api/use-trending'
-import { useDiscover } from '@/entities/movie/api/use-discover'
-import type { MovieFilters } from '@/features/movie-filters/ui/filter-bar'
+import { useSearch as useMovieSearch, useTrending, useDiscover } from '@/entities/movie'
+import type { MovieFilters } from '@/features/movie-filters'
 
 function hasFilters(f: MovieFilters) {
   return !!(f.genreIds.length || f.year || f.minRating || f.certification)

@@ -6,7 +6,7 @@ import {
   redirect,
 } from "@tanstack/react-router";
 import { z } from "zod";
-import { useAuthStore } from "@/entities/user/model/auth-store";
+import { useAuthStore } from "@/entities/user";
 import { AuthenticatedLayout } from "@/app/layouts/authenticated-layout";
 import { LoginPage } from "@/pages/login/ui/login-page";
 import { DiscoveryPage } from "@/pages/discovery/ui/discovery-page";

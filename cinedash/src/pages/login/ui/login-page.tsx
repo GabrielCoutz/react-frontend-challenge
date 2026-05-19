@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Film } from "lucide-react";
-import { LoginForm } from "@/features/auth/ui/login-form";
+import { LoginForm } from "@/features/auth";
 import { usePageTitle } from "@/shared/hooks/use-page-title";
 
 const QUOTES = [

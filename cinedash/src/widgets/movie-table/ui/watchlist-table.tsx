@@ -9,8 +9,7 @@ import {
 import { useMemo, useState } from "react";
 import { ArrowUpDown, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,9 +20,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useGenres } from "@/entities/movie/api/use-genres";
-import type { WatchlistMovie } from "@/features/watchlist/model/watchlist-store";
+} from "@/shared/ui/alert-dialog";
+import { useGenres } from "@/entities/movie";
+import type { WatchlistMovie } from "@/features/watchlist";
 
 function RemoveButton({ title, onConfirm }: { title: string; onConfirm: () => void }) {
   const [open, setOpen] = useState(false)

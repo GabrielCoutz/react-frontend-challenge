@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { usePageTitle } from '@/shared/hooks/use-page-title'
 import { SlidersHorizontal } from 'lucide-react'
-import { useWatchlistStore } from '@/features/watchlist/model/watchlist-store'
-import { WatchlistTable } from '@/widgets/movie-table/ui/watchlist-table'
-import { FilterBar, type MovieFilters } from '@/features/movie-filters/ui/filter-bar'
-import { Input } from '@/components/ui/input'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { useWatchlistStore } from '@/features/watchlist'
+import { WatchlistTable } from '@/widgets/movie-table'
+import { FilterBar, type MovieFilters } from '@/features/movie-filters'
+import { Input } from '@/shared/ui/input'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/shared/ui/sheet'
 
 const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined }
 

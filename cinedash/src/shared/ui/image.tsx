@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ImageOff } from 'lucide-react'
-import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { cn } from '@/shared/lib/utils'
 
 interface ImageProps {
   src: string | null | undefined

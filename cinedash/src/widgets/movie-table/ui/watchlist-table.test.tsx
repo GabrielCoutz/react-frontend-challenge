@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import { renderWithProviders } from '@/test/test-utils'
 import { WatchlistTable } from './watchlist-table'
-import type { WatchlistMovie } from '@/features/watchlist/model/watchlist-store'
+import type { WatchlistMovie } from '@/features/watchlist'
 
-vi.mock('@/entities/movie/api/use-genres', () => ({
+vi.mock('@/entities/movie', () => ({
   useGenres: () => ({ data: [{ id: 878, name: 'Ficção Científica' }, { id: 18, name: 'Drama' }] }),
 }))
 

@@ -1,25 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Check, ChevronsUpDown, X, User, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/shared/ui/command'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useGenres } from '@/entities/movie/api/use-genres'
-import { useCertifications } from '@/entities/movie/api/use-certifications'
-import { usePersonSearch } from '@/entities/movie/api/use-person-search'
+} from '@/shared/ui/select'
+import { Slider } from '@/shared/ui/slider'
+import { Badge } from '@/shared/ui/badge'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { useGenres, useCertifications, usePersonSearch } from '@/entities/movie'
 import { useDebounce } from '@/shared/hooks/use-debounce'
 import { getImageUrl } from '@/shared/api/tmdb-client'
 import { Image } from '@/shared/ui/image'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/lib/utils'
 
 export interface MovieFilters {
   genreIds: string[]

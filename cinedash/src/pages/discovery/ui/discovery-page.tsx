@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { usePageTitle } from "@/shared/hooks/use-page-title";
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { SearchInput } from "@/features/movie-search/ui/search-input";
-import { FilterBar, type MovieFilters } from "@/features/movie-filters/ui/filter-bar";
-import { MovieGrid } from "@/widgets/movie-grid/ui/movie-grid";
+import { Button } from "@/shared/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
+import { SearchInput } from "@/features/movie-search";
+import { FilterBar, type MovieFilters } from "@/features/movie-filters";
+import { MovieGrid } from "@/widgets/movie-grid";
 import { useDiscoveryFilters } from "@/pages/discovery/model/use-discovery-filters";
 
 function Pagination({ page, totalPages, onPage }: { page: number; totalPages: number; onPage: (n: number) => void }) {

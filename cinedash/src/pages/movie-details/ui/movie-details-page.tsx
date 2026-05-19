@@ -2,13 +2,11 @@ import { useEffect } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { ArrowLeft, Star, Plus, Check, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useMovie } from "@/entities/movie/api/use-movie";
-import { useCredits } from "@/entities/movie/api/use-credits";
-import { useVideos } from "@/entities/movie/api/use-videos";
-import { useWatchlistStore } from "@/features/watchlist/model/watchlist-store";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Skeleton } from "@/shared/ui/skeleton";
+import { useMovie, useCredits, useVideos } from "@/entities/movie";
+import { useWatchlistStore } from "@/features/watchlist";
 import { getImageUrl } from "@/shared/api/tmdb-client";
 import { Image } from "@/shared/ui/image";
 

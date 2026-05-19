@@ -1,5 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import { Navbar } from '@/widgets/navbar/ui/navbar'
+import { Navbar } from '@/widgets/navbar'
 
 export function AuthenticatedLayout() {
   return (

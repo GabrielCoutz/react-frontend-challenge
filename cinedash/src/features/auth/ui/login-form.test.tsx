@@ -7,7 +7,7 @@ import { LoginForm } from './login-form'
 const mockLogin = vi.fn()
 const mockOnSuccess = vi.fn()
 
-vi.mock('@/entities/user/model/auth-store', () => ({
+vi.mock('@/entities/user', () => ({
   useAuthStore: () => ({ login: mockLogin }),
 }))
 

@@ -1,8 +1,8 @@
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { Film, List, LogOut, Sun, Moon } from 'lucide-react'
-import { useAuthStore } from '@/entities/user/model/auth-store'
-import { useWatchlistStore } from '@/features/watchlist/model/watchlist-store'
-import { useThemeStore } from '@/features/theme/model/theme-store'
+import { useAuthStore } from '@/entities/user'
+import { useWatchlistStore } from '@/features/watchlist'
+import { useThemeStore } from '@/features/theme'
 
 export function Navbar() {
   const logout = useAuthStore((s) => s.logout)

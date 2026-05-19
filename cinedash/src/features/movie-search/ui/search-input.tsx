@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Search, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/shared/ui/input'
 import { useDebounce } from '@/shared/hooks/use-debounce'
 
 interface SearchInputProps {
