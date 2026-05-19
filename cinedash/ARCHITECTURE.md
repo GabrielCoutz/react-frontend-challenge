@@ -62,6 +62,24 @@ O TanStack Router protege rotas via `beforeLoad` no layout route `_authenticated
 
 ---
 
+## Performance
+
+Dashboards de curadoria carregam dados pesados — grades de filmes, tabelas, trailers. Entregar 849 kB de JavaScript num único chunk significa que o curador espera o código da watchlist carregar mesmo abrindo só o login. O bundle foi dividido por rota usando `lazyRouteComponent` — a API nativa do TanStack Router, escolhida sobre `React.lazy()` porque expõe `.preload()` (permite prefetch ao hover em links) e trata reload automático quando hashes de chunk mudam após deploy.
+
+O resultado é um bundle inicial de **411 kB (124 kB gzip)** — redução de 51% — com cada página carregando sob demanda:
+
+| Chunk | Gzip | Carrega quando |
+|---|---|---|
+| `index.js` (core) | 124 kB | sempre |
+| `movie-filters.js` | 74 kB | `/discovery` |
+| `image.js` | 21 kB | `/movie/:id` |
+| `watchlist.js` | 16 kB | `/watchlist` |
+| `login.js` | 13 kB | `/` |
+
+Durante o carregamento do chunk, o `AuthenticatedLayout` exibe um skeleton — a navbar já está visível e o layout não dá salto visual quando o conteúdo aparece.
+
+---
+
 ## Extras
 
 ### Design de referência (Figma)
@@ -74,7 +92,7 @@ O projeto conta com um arquivo Figma documentando o style guide, tokens de cor e
 
 ### Acessibilidade
 
-Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar, adicionar à lista, repetir. Interfaces que dependem exclusivamente do mouse introduzem fricção real no workflow e excluem usuários com deficiência motora ou visual. Por isso o projeto foi construído com conformidade WCAG 2.1 nível AAA e WAI-ARIA desde o início, não como ajuste posterior:
+Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar, adicionar à lista, repetir. Interfaces que dependem exclusivamente do mouse introduzem fricção real no workflow e excluem usuários com deficiência motora ou visual. Por isso o projeto foi construído com conformidade WCAG 2.1 nível AAA e WAI-ARIA desde o início:
 
 - **Navegação por teclado completa** com skip-nav link e landmarks semânticos (`<main>`, `<nav aria-label>`, `<aside>`, `<section>`)
 - **Formulário de login** com `aria-invalid`, `aria-describedby` em erros e `autoComplete` correto — compatível com gerenciadores de senha e leitores de tela
@@ -97,18 +115,21 @@ Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar,
 SPAs têm uma superfície de ataque específica que raramente aparece em checklists de code review: credenciais em URLs, dados sensíveis em `localStorage`, inputs externos não sanitizados e ausência de política de conteúdo. O projeto foi auditado contra esses vetores e endurecido em quatro frentes:
 
 **Tokens e credenciais**
-- Autenticação usa `crypto.randomUUID()` — 122 bits de entropia, não previsível
-- Credencial da API TMDB trafega exclusivamente via `Authorization: Bearer` header, nunca em query params (onde apareceria em logs de servidor, proxies e ferramentas de APM)
+
+- Autenticação usa `crypto.randomUUID()` — 122 bits de entropia, não previsível (mesmo sendo fake)
+- Credencial da API TMDB trafega exclusivamente via `Authorization: Bearer` header.
 
 **Política de conteúdo**
+
 - `Content-Security-Policy` restringindo scripts, conexões e frames a origens explicitamente permitidas (TMDB, YouTube)
 - `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin` e `Permissions-Policy` bloqueando câmera, microfone e geolocalização
 
 **Validação de dados externos**
+
 - Chave de vídeo da API TMDB validada contra `/^[A-Za-z0-9_-]{11}$/` antes de compor URL de iframe; iframe do YouTube com atributo `sandbox` explícito
 - Parâmetros de URL (`personName`, `sort_by`, `id`) validados com tipos estritos e allowlists — strings arbitrárias são descartadas antes de chegar à API
 - Leitura do `localStorage` no boot envolta em `try/catch` com allowlist de valores válidos — JSON corrompido não trava a aplicação
 
 **Ferramentas**
-- `ReactQueryDevtools` protegido por `import.meta.env.DEV` — cache de queries nunca exposto em produção
+
 - `eslint-plugin-security` no pipeline de lint — padrões inseguros são flagados em tempo de desenvolvimento
