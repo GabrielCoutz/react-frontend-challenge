@@ -2,19 +2,18 @@ import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import { MovieCard, MovieCardSkeleton } from './movie-card'
-import type { Movie, Genre } from '@/shared/api/tmdb.types'
+import type { Movie } from '@/shared/api/tmdb.types'
 
 const GRID_COLS = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
 
 interface MovieGridProps {
   movies: Movie[]
-  genres?: Genre[]
   isLoading: boolean
   isError: boolean
   onRetry?: () => void
 }
 
-export function MovieGrid({ movies, genres = [], isLoading, isError, onRetry }: MovieGridProps) {
+export function MovieGrid({ movies, isLoading, isError, onRetry }: MovieGridProps) {
   useEffect(() => {
     if (isError) toast.error('Falha ao carregar filmes. Tente novamente.')
   }, [isError])
@@ -53,7 +52,7 @@ export function MovieGrid({ movies, genres = [], isLoading, isError, onRetry }: 
         <ul className={GRID_COLS} aria-label={`${movies.length} filmes`}>
           {movies.map((movie) => (
             <li key={movie.id}>
-              <MovieCard movie={movie} genres={genres} />
+              <MovieCard movie={movie} />
             </li>
           ))}
         </ul>

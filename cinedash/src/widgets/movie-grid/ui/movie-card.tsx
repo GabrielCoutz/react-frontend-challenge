@@ -6,15 +6,16 @@ import { Badge } from '@/shared/ui/badge'
 import { Skeleton } from '@/shared/ui/skeleton'
 import { getImageUrl } from '@/shared/api/tmdb-client'
 import { useWatchlistStore } from '@/features/watchlist'
+import { useGenres } from '@/entities/movie'
 import { Image } from '@/shared/ui/image'
-import type { Movie, Genre } from '@/shared/api/tmdb.types'
+import type { Movie } from '@/shared/api/tmdb.types'
 
 interface MovieCardProps {
   movie: Movie
-  genres?: Genre[]
 }
 
-export function MovieCard({ movie, genres = [] }: MovieCardProps) {
+export function MovieCard({ movie }: MovieCardProps) {
+  const { data: genres = [] } = useGenres()
   const { add, remove, isInWatchlist } = useWatchlistStore()
   const inWatchlist = isInWatchlist(movie.id)
 
