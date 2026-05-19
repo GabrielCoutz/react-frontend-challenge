@@ -47,10 +47,9 @@ Para obter o token:
 ## Rodando o projeto
 
 ```bash
-npm run dev
+npm run build
+npm run preview      # http://localhost:4173
 ```
-
-Acesse: [http://localhost:5173](http://localhost:5173)
 
 **Login (simulado):** qualquer email válido + senha com 6+ caracteres.
 
@@ -62,13 +61,4 @@ Acesse: [http://localhost:5173](http://localhost:5173)
 npm test             # todos os testes
 npm run test:ui      # interface visual
 npm run coverage     # cobertura
-```
-
----
-
-## Build de produção
-
-```bash
-npm run build
-npm run preview      # http://localhost:4173
 ```
