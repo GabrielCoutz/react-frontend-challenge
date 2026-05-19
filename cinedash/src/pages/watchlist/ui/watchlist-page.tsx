@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { usePageTitle } from '@/shared/hooks/use-page-title'
 import { SlidersHorizontal } from 'lucide-react'
 import { useWatchlistStore } from '@/features/watchlist/model/watchlist-store'
 import { WatchlistTable } from '@/widgets/movie-table/ui/watchlist-table'
@@ -9,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined }
 
 export function WatchlistPage() {
+  usePageTitle('Minha Lista')
   const { movies, remove } = useWatchlistStore()
   const [filters, setFilters] = useState<MovieFilters>(EMPTY_FILTERS)
   const [titleSearch, setTitleSearch] = useState('')

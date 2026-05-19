@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ArrowLeft, Star, Plus, Check } from "lucide-react";
+import { ArrowLeft, Star, Plus, Check, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,9 +16,9 @@ export function MovieDetailsPage() {
   const { id } = useParams({ from: "/_authenticated/movie/$id" });
   const movieId = Number(id);
 
-  const { data: movie, isLoading: loadingMovie } = useMovie(movieId);
-  const { data: credits, isLoading: loadingCredits } = useCredits(movieId);
-  const { data: trailers = [], isLoading: loadingVideos } = useVideos(movieId);
+  const { data: movie, isLoading: loadingMovie, isError: errorMovie } = useMovie(movieId);
+  const { data: credits, isLoading: loadingCredits, isError: errorCredits, refetch: refetchCredits } = useCredits(movieId);
+  const { data: trailers = [], isLoading: loadingVideos, isError: errorVideos, refetch: refetchVideos } = useVideos(movieId);
 
   const { add, remove, isInWatchlist } = useWatchlistStore();
   const inWatchlist = movie ? isInWatchlist(movie.id) : false;
@@ -42,7 +42,7 @@ export function MovieDetailsPage() {
     }
   };
 
-  const isLoading = loadingMovie || loadingCredits || loadingVideos;
+  const isLoading = loadingMovie;
 
   useEffect(() => {
     document.title = movie ? `${movie.title} — CineDash` : 'CineDash'
@@ -54,6 +54,21 @@ export function MovieDetailsPage() {
   const backdropUrl = getImageUrl(movie?.backdrop_path ?? null, "original");
 
   if (isLoading) return <MovieDetailsSkeleton />;
+
+  if (errorMovie)
+    return (
+      <div className="container mx-auto p-6 py-20 flex flex-col items-center gap-3 text-muted-foreground">
+        <AlertCircle className="h-10 w-10 text-destructive" aria-hidden="true" />
+        <p className="text-lg font-medium text-foreground">Falha ao carregar o filme</p>
+        <p className="text-sm">Verifique sua conexão e tente novamente</p>
+        <button
+          onClick={() => window.history.back()}
+          className="mt-2 text-sm text-primary hover:underline"
+        >
+          Voltar
+        </button>
+      </div>
+    );
 
   if (!movie)
     return (
@@ -126,9 +141,26 @@ export function MovieDetailsPage() {
         </div>
 
         {/* Elenco */}
-        {topCast.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-semibold">Elenco</h2>
+        <section className="space-y-3">
+          <h2 className="text-lg sm:text-xl font-semibold">Elenco</h2>
+          {errorCredits ? (
+            <div role="alert" className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm">
+              <AlertCircle className="h-4 w-4 shrink-0 text-destructive" aria-hidden="true" />
+              <span className="text-muted-foreground">Falha ao carregar o elenco.</span>
+              <button onClick={() => refetchCredits()} className="ml-auto text-primary hover:underline shrink-0">
+                Tentar novamente
+              </button>
+            </div>
+          ) : loadingCredits ? (
+            <div className="flex gap-3 sm:gap-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="shrink-0 w-20 sm:w-24 space-y-2 text-center">
+                  <Skeleton className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mx-auto" />
+                  <Skeleton className="h-3 w-16 mx-auto" />
+                </div>
+              ))}
+            </div>
+          ) : topCast.length > 0 ? (
             <ul className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 pl-1 pt-1" aria-label="Elenco principal">
               {topCast.map((actor) => {
                 const photo = getImageUrl(actor.profile_path, "w185");
@@ -157,13 +189,23 @@ export function MovieDetailsPage() {
                 );
               })}
             </ul>
-          </section>
-        )}
+          ) : null}
+        </section>
 
         {/* Trailer */}
-        {trailer && (
-          <section className="space-y-3">
-            <h2 className="text-lg sm:text-xl font-semibold">Trailer</h2>
+        <section className="space-y-3">
+          <h2 className="text-lg sm:text-xl font-semibold">Trailer</h2>
+          {errorVideos ? (
+            <div role="alert" className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm">
+              <AlertCircle className="h-4 w-4 shrink-0 text-destructive" aria-hidden="true" />
+              <span className="text-muted-foreground">Falha ao carregar o trailer.</span>
+              <button onClick={() => refetchVideos()} className="ml-auto text-primary hover:underline shrink-0">
+                Tentar novamente
+              </button>
+            </div>
+          ) : loadingVideos ? (
+            <Skeleton className="aspect-video w-full rounded-lg" />
+          ) : trailer ? (
             <div className="aspect-video w-full rounded-lg overflow-hidden">
               <iframe
                 src={`https://www.youtube.com/embed/${trailer.key}`}
@@ -173,8 +215,10 @@ export function MovieDetailsPage() {
                 className="w-full h-full"
               />
             </div>
-          </section>
-        )}
+          ) : (
+            <p className="text-sm text-muted-foreground">Nenhum trailer disponível.</p>
+          )}
+        </section>
       </div>
     </div>
   );

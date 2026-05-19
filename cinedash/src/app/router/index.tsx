@@ -30,7 +30,6 @@ const rootRoute = createRootRoute({
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  head: () => ({ meta: [{ title: "Login — CineDash" }] }),
   beforeLoad: () => {
     const { isAuthenticated } = useAuthStore.getState();
     if (isAuthenticated) throw redirect({ to: "/discovery" });
@@ -53,7 +52,6 @@ const authenticatedRoute = createRoute({
 const discoveryRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/discovery",
-  head: () => ({ meta: [{ title: "Descobrir — CineDash" }] }),
   validateSearch: discoverySearchSchema,
   component: DiscoveryPage,
 });
@@ -67,7 +65,6 @@ const movieDetailsRoute = createRoute({
 const watchlistRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/watchlist",
-  head: () => ({ meta: [{ title: "Minha Lista — CineDash" }] }),
   component: WatchlistPage,
 });
 

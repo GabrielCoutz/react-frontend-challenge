@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Check, ChevronsUpDown, X, User } from 'lucide-react'
+import { Check, ChevronsUpDown, X, User, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
@@ -40,8 +40,12 @@ const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i)
 const EMPTY_FILTERS: MovieFilters = { genreIds: [], year: undefined, minRating: undefined }
 
 export function FilterBar({ filters, onChange, sidebar = false, personId, personName, onPersonChange }: FilterBarProps) {
-  const { data: genres = [] } = useGenres()
   const [genreOpen, setGenreOpen] = useState(false)
+  const { data: genres = [], isLoading: genresLoading, isError: genresError, refetch: refetchGenres } = useGenres(genreOpen)
+
+  useEffect(() => {
+    if (genresError) toast.error('Falha ao carregar gêneros. Tente novamente.')
+  }, [genresError])
   const [personOpen, setPersonOpen] = useState(false)
   const [personQuery, setPersonQuery] = useState('')
   const [pendingIds, setPendingIds] = useState<string[]>(filters.genreIds)
@@ -190,21 +194,45 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
           <Command>
             <CommandInput placeholder="Buscar gênero..." />
             <CommandList className="max-h-52">
-              <CommandEmpty>Nenhum gênero encontrado.</CommandEmpty>
-              <CommandGroup>
-                {genres.map((g) => {
-                  const id = String(g.id)
-                  const selected = pendingIds.includes(id)
-                  return (
-                    <CommandItem key={g.id} value={g.name} onSelect={() => toggleGenre(id)}>
-                      <div className={cn('mr-2 flex h-4 w-4 items-center justify-center rounded border border-border', selected && 'bg-primary border-primary')}>
-                        {selected && <Check className="h-3 w-3 text-white" />}
-                      </div>
-                      {g.name}
-                    </CommandItem>
-                  )
-                })}
-              </CommandGroup>
+              {genresLoading && (
+                <div className="space-y-2 p-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-7 w-full" />
+                  ))}
+                </div>
+              )}
+              {genresError && (
+                <div className="px-3 py-4 text-center space-y-2">
+                  <p className="text-xs font-medium text-destructive">Falha ao carregar gêneros</p>
+                  <p className="text-xs text-muted-foreground">Verifique sua conexão</p>
+                  <button
+                    onClick={() => void refetchGenres()}
+                    className="flex items-center gap-1.5 mx-auto text-xs text-primary hover:underline"
+                  >
+                    <RefreshCw className="h-3 w-3" aria-hidden="true" />
+                    Tentar novamente
+                  </button>
+                </div>
+              )}
+              {!genresLoading && !genresError && (
+                <>
+                  <CommandEmpty>Nenhum gênero encontrado.</CommandEmpty>
+                  <CommandGroup>
+                    {genres.map((g) => {
+                      const id = String(g.id)
+                      const selected = pendingIds.includes(id)
+                      return (
+                        <CommandItem key={g.id} value={g.name} onSelect={() => toggleGenre(id)}>
+                          <div className={cn('mr-2 flex h-4 w-4 items-center justify-center rounded border border-border', selected && 'bg-primary border-primary')}>
+                            {selected && <Check className="h-3 w-3 text-white" />}
+                          </div>
+                          {g.name}
+                        </CommandItem>
+                      )
+                    })}
+                  </CommandGroup>
+                </>
+              )}
             </CommandList>
           </Command>
           <div className="border-t border-border p-2 flex gap-2">

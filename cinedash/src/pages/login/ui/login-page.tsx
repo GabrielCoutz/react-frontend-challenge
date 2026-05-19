@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Film } from "lucide-react";
 import { LoginForm } from "@/features/auth/ui/login-form";
+import { usePageTitle } from "@/shared/hooks/use-page-title";
 
 const QUOTES = [
   { text: "Frankamente, minha cara, não me importo nem um pouco.", author: "Rhett Butler — E o Vento Levou (1939)" },
@@ -28,6 +29,7 @@ const QUOTES = [
 const RANDOM_QUOTE = QUOTES[Math.floor(Math.random() * QUOTES.length)]!
 
 export function LoginPage() {
+  usePageTitle('Login')
   const navigate = useNavigate();
 
   const handleSuccess = () => {

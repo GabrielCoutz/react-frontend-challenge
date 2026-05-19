@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { usePageTitle } from "@/shared/hooks/use-page-title";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 import {
@@ -17,7 +18,7 @@ import { MovieGrid } from "@/widgets/movie-grid/ui/movie-grid";
 import { useTrending } from "@/entities/movie/api/use-trending";
 import { useSearch as useMovieSearch } from "@/entities/movie/api/use-search";
 import { useDiscover } from "@/entities/movie/api/use-discover";
-import { useGenres } from "@/entities/movie/api/use-genres";
+
 import { Button } from "@/components/ui/button";
 
 function hasFilters(f: MovieFilters) {
@@ -97,6 +98,7 @@ function FilterSidebarContent({
 }
 
 export function DiscoveryPage() {
+  usePageTitle('Descobrir Filmes')
   const navigate = useNavigate({ from: "/discovery" });
   const [sheetOpen, setSheetOpen] = useState(false);
   const {
@@ -111,7 +113,7 @@ export function DiscoveryPage() {
     from: "/_authenticated/discovery",
   });
 
-  const { data: genres = [] } = useGenres();
+
   const filters: MovieFilters = { genreIds, year, minRating };
   const isSearching = query.trim().length > 0;
   const isFiltering = hasFilters(filters) || !!personId;
@@ -133,6 +135,7 @@ export function DiscoveryPage() {
       : trending;
   const movies = active.data?.results ?? [];
   const totalPages = active.data?.total_pages ?? 1;
+  const handleRetry = () => { void active.refetch() }
 
   const handleSearch = useCallback(
     (q: string) => {
@@ -234,9 +237,10 @@ export function DiscoveryPage() {
 
         <MovieGrid
           movies={movies}
-          genres={genres}
+
           isLoading={active.isLoading}
           isError={active.isError}
+          onRetry={handleRetry}
         />
 
         {totalPages > 1 && (
