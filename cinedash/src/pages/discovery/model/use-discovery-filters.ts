@@ -31,16 +31,18 @@ export function useDiscoveryFilters() {
   const searchResults = useMovieSearch(query, page)
   const discover = useDiscover({ page, genreIds, year, minRating, certification, personId })
 
-  const active = isSearching ? searchResults : isFiltering ? discover : trending
+  // Filtros têm prioridade: /discover/movie não suporta query de texto,
+  // por isso quando filtros estão ativos o texto é ignorado na API
+  const active = isFiltering ? discover : isSearching ? searchResults : trending
   const movies = active.data?.results ?? []
   const totalPages = active.data?.total_pages ?? 1
 
-  const sectionTitle = isSearching
-    ? `Resultados para "${query}"`
-    : personId
-      ? `Filmes com ${personName ?? '...'}`
-      : isFiltering
-        ? 'Filmes filtrados'
+  const sectionTitle = personId
+    ? `Filmes com ${personName ?? '...'}`
+    : isFiltering
+      ? 'Filmes filtrados'
+      : isSearching
+        ? `Resultados para "${query}"`
         : 'Trending Esta Semana'
 
   const activeFiltersCount =
