@@ -36,7 +36,7 @@ function RemoveButton({ title, onConfirm }: { title: string; onConfirm: () => vo
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger
         className="inline-flex h-8 w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-        aria-label="Remover da lista"
+        aria-label={`Remover ${title} da lista`}
       >
         <Trash2 className="h-4 w-4" />
       </AlertDialogTrigger>

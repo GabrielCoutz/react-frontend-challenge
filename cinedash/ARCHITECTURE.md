@@ -12,7 +12,7 @@ app > pages > widgets > features > entities > shared
 src/
   app/
     router/       # rotas + auth guard (beforeLoad)
-    layouts/      # AuthenticatedLayout + Navbar
+    layouts/      # AuthenticatedLayout
     providers/    # QueryClientProvider + Toaster
 
   pages/
