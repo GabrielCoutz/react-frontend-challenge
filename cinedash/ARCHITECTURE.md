@@ -62,25 +62,13 @@ O TanStack Router protege rotas via `beforeLoad` no layout route `_authenticated
 
 ---
 
-## Performance
+## Extras
 
-Dashboards de curadoria carregam dados pesados — grades de filmes, tabelas, trailers. Entregar 849 kB de JavaScript num único chunk significa que o curador espera o código da watchlist carregar mesmo abrindo só o login. O bundle foi dividido por rota usando `lazyRouteComponent` — a API nativa do TanStack Router, escolhida sobre `React.lazy()` porque expõe `.preload()` (permite prefetch ao hover em links) e trata reload automático quando hashes de chunk mudam após deploy.
+### Performance
 
-O resultado é um bundle inicial de **411 kB (124 kB gzip)** — redução de 51% — com cada página carregando sob demanda:
-
-| Chunk | Gzip | Carrega quando |
-|---|---|---|
-| `index.js` (core) | 124 kB | sempre |
-| `movie-filters.js` | 74 kB | `/discovery` |
-| `image.js` | 21 kB | `/movie/:id` |
-| `watchlist.js` | 16 kB | `/watchlist` |
-| `login.js` | 13 kB | `/` |
-
-Durante o carregamento do chunk, o `AuthenticatedLayout` exibe um skeleton — a navbar já está visível e o layout não dá salto visual quando o conteúdo aparece.
+Cada página é carregada sob demanda via `lazyRouteComponent` — a API nativa do TanStack Router, que além do code splitting expõe `.preload()` para prefetch ao hover em links e trata reload automático quando hashes de chunk mudam após deploy. Durante o carregamento, a navbar permanece visível e o conteúdo exibe skeleton — sem salto de layout.
 
 ---
-
-## Extras
 
 ### Design de referência (Figma)
 
