@@ -1,177 +1,22 @@
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  flexRender,
-  createColumnHelper,
-  type SortingState,
-} from "@tanstack/react-table";
-import { useMemo, useState } from "react";
-import { ArrowUpDown, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { Badge } from "@/shared/ui/badge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/shared/ui/alert-dialog";
-import { useGenres } from "@/entities/movie";
-import type { WatchlistMovie } from "@/features/watchlist";
-
-function RemoveButton({ title, onConfirm }: { title: string; onConfirm: () => void }) {
-  const [open, setOpen] = useState(false)
-
-  const handleConfirm = () => {
-    setOpen(false)
-    onConfirm()
-  }
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger
-        className="inline-flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
-        aria-label={`Remover ${title} da lista`}
-      >
-        <Trash2 className="h-4 w-4" />
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Remover da lista?</AlertDialogTitle>
-          <AlertDialogDescription>
-            "{title}" será removido da sua watchlist. Esta ação não pode ser desfeita.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm} className="bg-destructive text-white hover:bg-destructive/90">
-            Remover
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
+import { useReactTable, getCoreRowModel, getSortedRowModel, flexRender, type SortingState } from '@tanstack/react-table'
+import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { Badge } from '@/shared/ui/badge'
+import { useGenres } from '@/entities/movie'
+import type { WatchlistMovie } from '@/features/watchlist'
+import { RemoveButton } from './remove-button'
+import { useWatchlistColumns } from './watchlist-columns'
 
 interface WatchlistTableProps {
-  movies: WatchlistMovie[];
-  onRemove: (movieId: number) => void;
-}
-
-const columnHelper = createColumnHelper<WatchlistMovie>();
-
-function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
-  if (!sorted) return <ArrowUpDown className="ml-1 h-3 w-3 opacity-40" />;
-  if (sorted === "asc") return <ArrowUp className="ml-1 h-3 w-3" />;
-  return <ArrowDown className="ml-1 h-3 w-3" />;
+  movies: WatchlistMovie[]
+  onRemove: (movieId: number) => void
 }
 
 export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const { data: genres = [] } = useGenres();
+  const [sorting, setSorting] = useState<SortingState>([])
+  const { data: genres = [] } = useGenres()
 
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("title", {
-        header: ({ column }) => (
-          <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Título <SortIcon sorted={column.getIsSorted()} />
-          </button>
-        ),
-        cell: ({ row }) => (
-          <Link to="/movie/$id" params={{ id: String(row.original.id) }} title={row.original.title} className="font-medium hover:underline line-clamp-1">
-            {row.original.title}
-          </Link>
-        ),
-      }),
-
-      columnHelper.accessor((row) => row.genre_ids?.[0] ?? 0, {
-        id: "genre",
-        header: ({ column }) => (
-          <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Gênero <SortIcon sorted={column.getIsSorted()} />
-          </button>
-        ),
-        cell: ({ row }) => {
-          const name = genres.find((g) => g.id === (row.original.genre_ids?.[0] ?? 0))?.name ?? "—";
-          return <Badge variant="secondary">{name}</Badge>;
-        },
-        sortingFn: (a, b) => {
-          const nameA = genres.find((g) => g.id === (a.original.genre_ids?.[0] ?? 0))?.name ?? "";
-          const nameB = genres.find((g) => g.id === (b.original.genre_ids?.[0] ?? 0))?.name ?? "";
-          return nameA.localeCompare(nameB);
-        },
-      }),
-
-      columnHelper.accessor("release_date", {
-        header: ({ column }) => (
-          <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Lançamento <SortIcon sorted={column.getIsSorted()} />
-          </button>
-        ),
-        cell: ({ getValue }) => {
-          const val = getValue()
-          if (!val) return "—"
-          return new Date(val + "T00:00:00").toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })
-        },
-      }),
-
-      columnHelper.accessor("certification", {
-        header: ({ column }) => (
-          <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Faixa <SortIcon sorted={column.getIsSorted()} />
-          </button>
-        ),
-        cell: ({ getValue }) => {
-          const cert = getValue()
-          return cert
-            ? <span className="font-mono text-xs font-bold border border-border rounded px-1.5 py-0.5">{cert}</span>
-            : <span className="text-muted-foreground">—</span>
-        },
-        sortingFn: (a, b) => {
-          const order = ["L", "10", "12", "14", "16", "18"]
-          const ia = order.indexOf(a.original.certification ?? "")
-          const ib = order.indexOf(b.original.certification ?? "")
-          const wa = ia === -1 ? order.length : ia
-          const wb = ib === -1 ? order.length : ib
-          return wa - wb
-        },
-      }),
-
-      columnHelper.accessor("vote_average", {
-        header: ({ column }) => (
-          <button className="flex items-center font-medium" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Rating <SortIcon sorted={column.getIsSorted()} />
-          </button>
-        ),
-        cell: ({ getValue }) => (
-          <span className="font-medium">
-            <span aria-hidden="true">★ </span>
-            <span className="sr-only">Avaliação: </span>
-            {getValue().toFixed(1)}
-          </span>
-        ),
-      }),
-
-      columnHelper.display({
-        id: "actions",
-        header: "Ações",
-        cell: ({ row }) => (
-          <RemoveButton title={row.original.title} onConfirm={() => onRemove(row.original.id)} />
-        ),
-      }),
-    ],
-    [genres, onRemove],
-  );
+  const columns = useWatchlistColumns(genres, onRemove)
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -181,9 +26,9 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-  });
+  })
 
-  const rows = table.getRowModel().rows;
+  const rows = table.getRowModel().rows
 
   if (rows.length === 0) {
     return (
@@ -199,7 +44,7 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
       <ul className="sm:hidden space-y-3" aria-label="Watchlist de filmes">
         {rows.map((row) => {
           const movie = row.original
-          const genreName = genres.find((g) => g.id === (movie.genre_ids?.[0] ?? 0))?.name ?? "—"
+          const genreName = genres.find((g) => g.id === (movie.genre_ids?.[0] ?? 0))?.name ?? '—'
           return (
             <li key={row.id} className="rounded-md border bg-card p-4 space-y-3">
               <div className="flex items-start justify-between gap-2">
@@ -224,8 +69,8 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Lançamento</p>
                   <p className="text-sm">
                     {movie.release_date
-                      ? new Date(movie.release_date + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })
-                      : "—"}
+                      ? new Date(movie.release_date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+                      : '—'}
                   </p>
                 </div>
                 <div className="space-y-0.5">
@@ -284,5 +129,5 @@ export function WatchlistTable({ movies, onRemove }: WatchlistTableProps) {
         </table>
       </div>
     </>
-  );
+  )
 }
