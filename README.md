@@ -1,88 +1,53 @@
-# ⚛️ Desafio React Frontend
+## O que foi feito
 
-Bem-vindo ao repositório de avaliação técnica para a vaga de **Desenvolvedor React Pleno**.
+Implementação completa do **[CineDash](https://github.com/buzzmates/react-frontend-challenge/blob/main/cases/01-cinedash.md)**, dashboard de curadoria e descoberta de filmes via [TMDB API](https://developer.themoviedb.org/docs/getting-started), cobrindo todos os requisitos obrigatórios e com extras de qualidade.
 
-Este não é apenas um teste de codificação; é uma oportunidade para você demonstrar como estrutura aplicações escaláveis, toma decisões arquiteturais e prioriza a experiência do usuário.
+### Funcionalidades
 
-Estamos buscando profissionais que entendam que "fazer funcionar" é apenas o primeiro passo. O nosso foco está também em: **Manutenibilidade, Performance e Boas Práticas.**
+- **Autenticação simulada** — login com validação [Zod](https://zod.dev/), token via [crypto.randomUUID](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID), sessão protegida por route guard no [TanStack Router](https://tanstack.com/router/latest)
+- **Dashboard de descoberta** — trending semanal, busca com debounce 400ms, filtros avançados (gênero, ano, rating, classificação indicativa, elenco), paginação e estado de URL como fonte de verdade
+- **Watchlist** — adicionar/remover com confirmação, tabela sortável ([TanStack Table](https://tanstack.com/table/latest)), filtros locais por título/gênero/ano/rating, layout responsivo com drawer mobile
+- **Detalhes do filme** — sinopse, elenco, trailer via iframe YouTube, botão watchlist e classificação indicativa
+- **Tema dark/light** — toggle persistido via Zustand
 
----
+### Arquitetura
 
-## 🎯 O Objetivo
+- **[Feature-Sliced Design (FSD)](https://feature-sliced.design/)** — `app > pages > widgets > features > entities > shared`, com `index.ts` público em cada slice
+- **Code splitting por rota** — `lazyRouteComponent` (API nativa do [TanStack Router](https://tanstack.com/router/v1/docs/api/router/lazyRouteComponentFunction)) com skeleton.
+- **[TanStack Query](https://tanstack.com/query/latest)** — staleTime configurado por endpoint, lazy fetch (por demanda) em gêneros e certificações, evitando requests desnecessárias.
 
-O desafio consiste em desenvolver uma aplicação Front-end que consuma uma API pública, focando na criação de interfaces ricas (Dashboards, Tabelas, Filtros) e na gestão eficiente de estado e dados assíncronos.
+### Extras
 
-### 📂 Escolha sua Missão
+- **Segurança** — CSP, headers HTTP, Bearer token auth, validação de inputs externos (trailer key, sort_by allowlist, parseInt para IDs), `[eslint-plugin-security](https://github.com/eslint-community/eslint-plugin-security)`; token de sessão em **cookie assinado com HMAC-SHA256** ([Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API)) com `SameSite=Strict` e assinatura em base64url
+- **Acessibilidade WCAG 2.1 AAA** — skip-nav, landmarks semânticos, `aria-live`, `aria-sort`, `aria-label` contextuais, contraste verificado
+- **Testes** — 109 testes unitários cobrindo stores, hooks, regras de negócio e assinatura HMAC do cookie
 
-Você tem a liberdade de escolher **um** dos dois desafios abaixo para implementar. Ambos possuem o mesmo peso e complexidade técnica. Escolha aquele com o qual você se sentir mais criativo:
+## Como testar
 
-- **[Opção A: CineDash (Filmes)](./cases/01-cinedash.md)** – Crie um dashboard analítico para curadoria de cinema.
-- **[Opção B: Libris (Livros)](./cases/02-libris.md)** – Desenvolva um gerenciador de biblioteca pessoal e estante virtual.
+### Pré-requisitos
 
----
+1. Copiar `.env.local.example` → `.env.local`
+2. Preencher `VITE_TMDB_ACCESS_TOKEN` com o **API Read Access Token** de [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api)
+3. Preencher `VITE_TMDB_BASE_URL=https://api.themoviedb.org/3` e `VITE_TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p`
+4. (Opcional) Preencher `VITE_COOKIE_SIGNING_SECRET` com uma string aleatória longa — se omitido, usa fallback de desenvolvimento
 
-## 🛠 Tech Stack Obrigatória
+### Rodar
 
-Para alinhar com a nossa stack atual e garantir uma avaliação justa, exigimos o uso das seguintes tecnologias. **Por favor, não utilize alternativas (ex: Redux ou Context API para estado global complexo) a menos que justificável no seu README.**
+```bash
+npm install
+npm run build
+npm run preview   # http://localhost:4173
+```
 
-- **Core:** React 18+, TypeScript (Strict), Vite.
-- **Server State & Cache:** TanStack Query.
-- **Client State:** Zustand.
-- **Routing:** TanStack Router (Preferencial) ou React Router v6 (com Data Loaders).
-- **UI Components:** Shadcn/ui + TailwindCSS.
-- **Formulários:** React Hook Form ou TanStack Form + Zod (validação).
-- **Testes:** Vitest + React Testing Library.
+**Login:** qualquer email válido + senha com 6+ caracteres
 
-> **Diferencial:** Implementação de `TanStack Table` para listagens complexas.
+### Testes
 
----
+```bash
+npm test
+```
 
-## 🧠 Critérios de Avaliação (O que olhamos)
+## Documentação
 
-Seu código será revisado como se fosse um Pull Request real para a nossa codebase de produção.
-
-### 1. Arquitetura e Organização
-
-- Uso de **Feature-Sliced Design (FSD)**, Clean Architecture ou uma estrutura modular sólida.
-- Separação clara entre UI (Componentes), Lógica (Hooks) e Dados (Services/Adapters).
-- Código limpo, legível e seguindo princípios SOLID.
-
-### 2. Qualidade Técnica
-
-- Domínio do **TypeScript** (evitar `any`, tipagem correta de generics e props).
-- Uso correto do **TanStack Query** (cache keys, invalidation, prefetching).
-- Tratamento de erros e estados de loading (Skeletons, Error Boundaries).
-- Performance (memorização onde necessário, debouncing em buscas).
-
-### 3. Testes e Confiabilidade
-
-- Não buscamos 100% de cobertura, mas sim **testes significativos**.
-- Testes unitários em hooks complexos e utilitários.
-- Testes de integração nos fluxos principais (ex: Adicionar item à lista, filtrar tabela).
-
-### 4. Documentação e Git
-
-- Histórico de commits organizado.
-- Arquivo `INSTRUCTIONS.md` com instruções claras de como rodar o projeto e qual projeto foi escolhido.
-- Arquivo `ARCHITECTURE.md` explicando suas decisões técnicas (Por que usou X? Como resolveu Y?).
-
----
-
-## 🚀 Como entregar
-
-1.  Faça um **fork** deste repositório para a sua própria conta do GitHub.
-2.  Desenvolva sua solução em uma branch separada (ex: `feature/cinedash-impl` ou `feature/libris-impl`).
-3.  Quando finalizar, abra um **Pull Request** da sua branch de desenvolvimento para a branch `main` do **seu** repositório forkado. **Atenção: Não abra o PR para o repositório original da empresa.**
-4.  No corpo do PR, utilize o template fornecido e inclua uma breve descrição do que foi feito, além do projeto escolhido.
-5.  Envie o link do seu Pull Request (ou do repositório) para o recrutador responsável.
-
----
-
-## ⏳ Prazo e Escopo
-
-Sabemos que este é um desafio complexo.
-
-- **Prazo para entrega:** Você terá o prazo de 7 dias corridos para realização do desafio.
-- **Faltou tempo?** Se não conseguir entregar tudo, **priorize a qualidade sobre a quantidade**. É melhor entregar uma funcionalidade perfeitamente arquitetada e testada do que três funcionalidades quebradas. Documente o que faltou no seu README.
-
-**Boa sorte! Estamos ansiosos para ver seu código.** 🚀
+- [INSTRUCTIONS.md](./INSTRUCTIONS.md) — setup detalhado
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — decisões técnicas
