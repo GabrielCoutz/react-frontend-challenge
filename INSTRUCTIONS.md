@@ -34,6 +34,10 @@ cp .env.local.example .env.local
 VITE_TMDB_ACCESS_TOKEN=seu_token_aqui
 VITE_TMDB_BASE_URL=https://api.themoviedb.org/3
 VITE_TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p
+
+# Opcional — chave para assinar o cookie de sessão com HMAC-SHA256
+# Use uma string aleatória longa em produção; se omitido, usa fallback de desenvolvimento
+VITE_COOKIE_SIGNING_SECRET=
 ```
 
 Para obter o token:
