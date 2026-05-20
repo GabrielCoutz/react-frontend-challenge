@@ -5,6 +5,12 @@ vi.mock('@/shared/utils/generateAuthToken', () => ({
   generateAuthToken: () => 'mock-token-abc',
 }))
 
+vi.mock('@/shared/utils/cookieStorage', () => ({
+  setSignedAuthToken: vi.fn().mockResolvedValue(undefined),
+  getSignedAuthToken: vi.fn().mockResolvedValue(null),
+  removeAuthToken: vi.fn(),
+}))
+
 describe('auth-store', () => {
   beforeEach(() => {
     useAuthStore.setState({ token: null, isAuthenticated: false })
@@ -37,9 +43,9 @@ describe('auth-store', () => {
       expect(useAuthStore.getState().token).toBe('mock-token-abc')
     })
 
-    it('não autentica antes do delay de 2s completar', async () => {
+    it('não autentica antes do delay de 2s completar', () => {
       useAuthStore.getState().login('user@test.com', 'senha123')
-      await vi.advanceTimersByTimeAsync(1999)
+      vi.advanceTimersByTime(1000)
       expect(useAuthStore.getState().isAuthenticated).toBe(false)
     })
   })

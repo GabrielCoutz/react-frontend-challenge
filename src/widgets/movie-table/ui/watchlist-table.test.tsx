@@ -58,14 +58,14 @@ describe('WatchlistTable', () => {
 
   it('abre dialog de confirmação ao clicar em remover', async () => {
     renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
-    const removeButtons = screen.getAllByRole('button', { name: /remover da lista/i })
+    const removeButtons = screen.getAllByRole('button', { name: /remover .+ da lista/i })
     await userEvent.click(removeButtons[0]!)
     expect(screen.getByText('Remover da lista?')).toBeInTheDocument()
   })
 
   it('chama onRemove ao confirmar no dialog', async () => {
     renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
-    const removeButtons = screen.getAllByRole('button', { name: /remover da lista/i })
+    const removeButtons = screen.getAllByRole('button', { name: /remover .+ da lista/i })
     await userEvent.click(removeButtons[0]!)
     const confirmBtn = screen.getByRole('button', { name: /^remover$/i })
     await userEvent.click(confirmBtn)
@@ -74,7 +74,7 @@ describe('WatchlistTable', () => {
 
   it('não chama onRemove ao cancelar no dialog', async () => {
     renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
-    const removeButtons = screen.getAllByRole('button', { name: /remover da lista/i })
+    const removeButtons = screen.getAllByRole('button', { name: /remover .+ da lista/i })
     await userEvent.click(removeButtons[0]!)
     const cancelBtn = screen.getByRole('button', { name: /cancelar/i })
     await userEvent.click(cancelBtn)
