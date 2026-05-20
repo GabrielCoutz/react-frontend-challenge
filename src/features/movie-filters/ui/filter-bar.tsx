@@ -128,7 +128,7 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
             <Popover open={personOpen} onOpenChange={(open) => { if (!open) setPersonQuery(''); setPersonOpen(open) }}>
               <PopoverTrigger
                 className={cn(
-                  'inline-flex h-8 items-center justify-between rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors hover:bg-accent focus:outline-none text-muted-foreground',
+                  'inline-flex h-11 sm:h-8 items-center justify-between rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors hover:bg-accent focus:outline-none text-muted-foreground',
                   sidebar ? 'w-full' : 'w-44',
                 )}
               >
@@ -195,7 +195,7 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
       }}>
         <PopoverTrigger
           className={cn(
-            'inline-flex h-8 items-center justify-between rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors hover:bg-accent focus:outline-none',
+            'inline-flex h-11 sm:h-8 items-center justify-between rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors hover:bg-accent focus:outline-none',
             sidebar ? 'w-full' : 'w-44',
             !genreLabel() && 'text-muted-foreground',
           )}
@@ -249,10 +249,10 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
             </CommandList>
           </Command>
           <div className="border-t border-border p-2 flex gap-2">
-            <button onClick={() => setPendingIds([])} aria-label="Limpar seleção de gêneros" className="flex-1 rounded-md py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => setPendingIds([])} aria-label="Limpar seleção de gêneros" className="flex-1 rounded-md min-h-11 sm:min-h-8 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
               Limpar
             </button>
-            <button onClick={applyGenres} aria-label={`Aplicar ${pendingIds.length} gênero${pendingIds.length !== 1 ? 's' : ''} selecionado${pendingIds.length !== 1 ? 's' : ''}`} className="flex-1 rounded-md bg-primary py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
+            <button onClick={applyGenres} aria-label={`Aplicar ${pendingIds.length} gênero${pendingIds.length !== 1 ? 's' : ''} selecionado${pendingIds.length !== 1 ? 's' : ''}`} className="flex-1 rounded-md bg-primary min-h-11 sm:min-h-8 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors">
               Aplicar {pendingIds.length > 0 && `(${pendingIds.length})`}
             </button>
           </div>
@@ -346,7 +346,7 @@ export function FilterBar({ filters, onChange, sidebar = false, personId, person
       </div>
 
       {hasActiveFilters && (
-        <button onClick={handleClearAll} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-colors">
+        <button onClick={handleClearAll} className="flex min-h-11 sm:min-h-0 items-center gap-1.5 px-1 text-xs text-muted-foreground hover:text-destructive transition-colors">
           <X className="h-3 w-3" aria-hidden="true" />
           Limpar filtros
         </button>

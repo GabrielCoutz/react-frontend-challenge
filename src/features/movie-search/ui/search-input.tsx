@@ -33,7 +33,7 @@ export function SearchInput({ onSearch, initialValue = '' }: SearchInputProps) {
       {value && (
         <button
           onClick={handleClear}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="absolute right-1 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           aria-label="Limpar busca"
         >
           <X className="h-4 w-4" />

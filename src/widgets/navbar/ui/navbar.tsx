@@ -31,7 +31,7 @@ export function Navbar() {
           to="/discovery"
           aria-label="Discovery"
           aria-current={discoveryActive ? 'page' : undefined}
-          className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+          className={`flex items-center gap-2 px-2 sm:px-3 py-3 sm:py-1.5 text-sm font-medium transition-colors rounded-md ${
             discoveryActive
               ? 'text-foreground border-b-2 border-primary rounded-none pb-[5px]'
               : 'text-muted-foreground hover:text-foreground'
@@ -45,7 +45,7 @@ export function Navbar() {
           to="/watchlist"
           aria-label={`Watchlist${watchlistCount > 0 ? `, ${watchlistCount} filmes` : ''}`}
           aria-current={watchlistActive ? 'page' : undefined}
-          className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 text-sm font-medium transition-colors rounded-md ${
+          className={`flex items-center gap-2 px-2 sm:px-3 py-3 sm:py-1.5 text-sm font-medium transition-colors rounded-md ${
             watchlistActive
               ? 'text-foreground border-b-2 border-primary rounded-none pb-[5px]'
               : 'text-muted-foreground hover:text-foreground'
@@ -65,7 +65,7 @@ export function Navbar() {
         <button
           onClick={toggle}
           aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+          className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
         >
           {theme === 'dark'
             ? <Sun className="h-4 w-4" aria-hidden="true" />
@@ -75,7 +75,7 @@ export function Navbar() {
         <button
           onClick={handleLogout}
           aria-label="Sair da conta"
-          className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+          className="flex h-11 sm:h-8 items-center gap-1.5 px-2 font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
         >
           <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:inline" aria-hidden="true">Sair</span>

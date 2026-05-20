@@ -92,6 +92,7 @@ Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar,
 - **Tabela da watchlist** com `aria-sort` nas colunas ordenáveis; mobile usa `<ul>/<li>` semânticos
 - **Botões com contexto completo** — `aria-label="Adicionar Inception à watchlist"` em vez de `"Adicionar"`, eliminando ambiguidade para leitores de tela
 - **Paleta verificada contra WCAG 2.1 SC 1.4.6 (Contrast Enhanced, Level AAA)**
+- **Touch targets ≥ 44×44px no mobile** (WCAG 2.5.5 AAA / Apple HIG) — todos os elementos interativos usam tamanhos responsivos: 44px por padrão, reduzidos via `sm:` no desktop. Cobre `Button` (todos os variants), `Input`, `InputGroup`, `SelectTrigger`, `CommandInput`, `CommandItem` (`min-h-11`), `SliderControl` + thumb (`after:-inset-4`), e botões custom em `Navbar`, `MovieCard`, `FilterBar`, `WatchlistTable`, `SearchInput` e `LoginForm`
 
 #### Testes de regressão de acessibilidade
 
