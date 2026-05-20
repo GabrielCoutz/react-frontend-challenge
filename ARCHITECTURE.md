@@ -44,11 +44,15 @@ src/
 
 ## Autenticação sem backend
 
-Login valida email + senha via Zod. Ao autenticar, `generateAuthToken()` gera um UUID e o Zustand `persist` salva `{ token, isAuthenticated }` em cookie (`auth-storage`) via `cookieStorage` — um adapter `StateStorage` customizado com `SameSite=Strict`, `Secure` (apenas em HTTPS) e `max-age` de 7 dias.
+Login valida email + senha via Zod. Ao autenticar, `generateAuthToken()` gera um UUID armazenado em **cookie assinado** com HMAC-SHA256 via `crypto.subtle` (Web Crypto API nativa) — `SameSite=Strict`, `Secure` (HTTPS), `max-age` de 7 dias. O valor é codificado em base64url (`A-Za-z0-9-_`, sem `+`, `/` ou `=`), eliminando URL-encoding e garantindo que qualquer alteração de caractere invalide a assinatura. A chave de assinatura é configurada via `VITE_COOKIE_SIGNING_SECRET`.
+
+O cookie armazena somente o token (`uuid.hmac-sig`). O estado da store (`isAuthenticated`) fica em memória e é repopulado pelo `beforeLoad` a cada carregamento — a sessão sobrevive a reloads enquanto o cookie for válido.
 
 `crypto.randomUUID()` só está disponível em **secure contexts** (HTTPS ou `localhost`) — restrição de spec W3C, não do build. Em HTTP puro (ex: preview sem TLS) o campo é `undefined` e o login quebra. Por isso `generateAuthToken` usa `crypto.randomUUID` quando disponível e cai num gerador UUID v4 manual (`Math.random`) como fallback.
 
-O TanStack Router protege rotas via `beforeLoad` no layout route `_authenticated` (pathless). Se `isAuthenticated` for falso, redireciona para `/`. A sessão sobrevive ao reload porque o store é reidratado do cookie antes do React montar.
+O TanStack Router protege rotas via `beforeLoad` assíncrono no layout route `_authenticated` (pathless), seguindo o padrão recomendado pelas docs com `throw redirect()` e `isRedirect()`. O guard valida o cookie a cada navegação — se o token for ausente, corrompido ou com assinatura inválida, o cookie é removido e o usuário é redirecionado para `/`. Qualquer erro inesperado na validação (ex: falha de crypto) também resulta em redirect, via `catch` com re-throw seletivo. A store é atualizada pelo próprio guard após validação bem-sucedida.
+
+**Limitação conhecida:** a chave de assinatura reside no bundle JavaScript, o que é inerente a SPAs sem backend. A proteção é contra adulteração manual do cookie no browser — não contra XSS ou extração da chave do bundle. `HttpOnly` requereria um servidor.
 
 ---
 
@@ -98,7 +102,7 @@ SPAs têm uma superfície de ataque específica que raramente aparece em checkli
 **Tokens e credenciais**
 
 - Autenticação usa `crypto.randomUUID()` — mesmo sendo fake
-- Token de sessão armazenado em cookie com `SameSite=Strict` + `Secure` (HTTPS) — protege contra CSRF; `HttpOnly` não é aplicável em SPAs sem backend
+- Token de sessão armazenado em cookie assinado com HMAC-SHA256 (`crypto.subtle`) via `VITE_COOKIE_SIGNING_SECRET`; valor em base64url para que qualquer alteração de caractere quebre a assinatura; `SameSite=Strict` previne CSRF; `HttpOnly` não é aplicável em SPAs sem backend
 - Credencial da API TMDB trafega exclusivamente via `Authorization: Bearer` header.
 
 **Política de conteúdo**

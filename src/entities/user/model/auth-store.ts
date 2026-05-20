@@ -1,7 +1,9 @@
-import { cookieStorage } from "@/shared/utils/cookieStorage";
+import {
+  removeAuthToken,
+  setSignedAuthToken,
+} from "@/shared/utils/cookieStorage";
 import { generateAuthToken } from "@/shared/utils/generateAuthToken";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
 interface AuthState {
   token: string | null;
@@ -10,30 +12,23 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      token: null,
-      isAuthenticated: false,
+export const useAuthStore = create<AuthState>()((set) => ({
+  token: null,
+  isAuthenticated: false,
 
-      async login() {
-        await new Promise((r) => setTimeout(r, 2000)); // intentional 2s delay to simulate network request
+  async login() {
+    await new Promise((r) => setTimeout(r, 1000)); // intentional 1s delay to simulate network request
 
-        const authToken = generateAuthToken();
+    const authToken = generateAuthToken();
 
-        set({ token: authToken, isAuthenticated: true });
+    await setSignedAuthToken(authToken);
+    set({ token: authToken, isAuthenticated: true });
 
-        return true;
-      },
+    return true;
+  },
 
-      logout: () => {
-        set({ token: null, isAuthenticated: false });
-      },
-    }),
-    {
-      name: "auth-storage",
-      storage: cookieStorage,
-      partialize: (state) => ({ token: state.token, isAuthenticated: state.isAuthenticated }),
-    },
-  ),
-);
+  logout: () => {
+    removeAuthToken();
+    set({ token: null, isAuthenticated: false });
+  },
+}));

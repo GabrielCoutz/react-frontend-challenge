@@ -1,7 +1,7 @@
-import { Suspense } from 'react'
-import { Outlet } from '@tanstack/react-router'
-import { Navbar } from '@/widgets/navbar'
-import { Skeleton } from '@/shared/ui/skeleton'
+import { Suspense } from "react";
+import { Outlet } from "@tanstack/react-router";
+import { Navbar } from "@/widgets/navbar";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 function PageSkeleton() {
   return (
@@ -16,7 +16,7 @@ function PageSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function AuthenticatedLayout() {
@@ -35,5 +35,5 @@ export function AuthenticatedLayout() {
         </Suspense>
       </main>
     </div>
-  )
+  );
 }

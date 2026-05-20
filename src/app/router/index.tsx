@@ -2,11 +2,13 @@ import {
   createRouter,
   createRootRoute,
   createRoute,
+  isRedirect,
   Outlet,
   redirect,
 } from "@tanstack/react-router";
 import { z } from "zod";
 import { useAuthStore } from "@/entities/user";
+import { getSignedAuthToken, removeAuthToken } from "@/shared/utils/cookieStorage";
 import { AuthenticatedLayout } from "@/app/layouts/authenticated-layout";
 import { LoginPage, DiscoveryPage, MovieDetailsPage, WatchlistPage } from "./lazy-pages";
 
@@ -28,9 +30,13 @@ const rootRoute = createRootRoute({
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  beforeLoad: () => {
-    const { isAuthenticated } = useAuthStore.getState();
-    if (isAuthenticated) throw redirect({ to: "/discovery" });
+  beforeLoad: async () => {
+    try {
+      const token = await getSignedAuthToken();
+      if (token) throw redirect({ to: "/discovery" });
+    } catch (error) {
+      if (isRedirect(error)) throw error;
+    }
   },
   component: LoginPage,
 });
@@ -40,9 +46,19 @@ const loginRoute = createRoute({
 const authenticatedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "_authenticated",
-  beforeLoad: () => {
-    const { isAuthenticated } = useAuthStore.getState();
-    if (!isAuthenticated) throw redirect({ to: "/" });
+  beforeLoad: async () => {
+    try {
+      const token = await getSignedAuthToken();
+      if (!token) {
+        removeAuthToken();
+        throw redirect({ to: "/" });
+      }
+      useAuthStore.setState({ token, isAuthenticated: true });
+    } catch (error) {
+      if (isRedirect(error)) throw error;
+      removeAuthToken();
+      throw redirect({ to: "/" });
+    }
   },
   component: AuthenticatedLayout,
 });
