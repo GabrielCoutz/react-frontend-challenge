@@ -93,6 +93,18 @@ Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar,
 - **Botões com contexto completo** — `aria-label="Adicionar Inception à watchlist"` em vez de `"Adicionar"`, eliminando ambiguidade para leitores de tela
 - **Paleta verificada contra WCAG 2.1 SC 1.4.6 (Contrast Enhanced, Level AAA)**
 
+#### Testes de regressão de acessibilidade
+
+Cada atributo ARIA documentado acima tem cobertura de teste dedicada — qualquer remoção acidental quebra o CI antes de chegar à produção. A suite usa [`jest-axe`](https://github.com/nickcolley/jest-axe) (axe-core) para varredura automática de violações WCAG e `@testing-library` para fixar atributos específicos.
+
+| Componente | Atributos/comportamentos cobertos |
+|---|---|
+| `LoginForm` | `aria-invalid` por campo, `aria-describedby` apontando para `id` do alerta, `role="alert"` nos erros, `autoComplete` nos inputs, `aria-label` dinâmico do toggle de senha (`"Mostrar"` / `"Ocultar"`), `aria-busy` no submit |
+| `WatchlistTable` | `aria-sort="none/ascending/descending"` nas colunas ordenáveis, ausência de `aria-sort` em colunas não ordenáveis, ★ `aria-hidden="true"`, `sr-only "Avaliação:"`, `aria-label` contextual nos botões de remoção |
+| `MovieGrid` | `aria-live="polite"` no container, `aria-busy` refletindo estado de loading, `aria-label="Carregando filmes"` na lista skeleton, `role="alert"` no estado de erro, `role="status"` no estado vazio, `aria-label="{n} filmes"` na lista populada |
+| `MovieCard` | `aria-label="Ver detalhes de {título}"` no link, `aria-label` e `aria-pressed` do botão watchlist refletindo estado (`"Adicionar"` / `"Remover"` com título), overlay decorativo `aria-hidden="true"`, texto `sr-only` para rating |
+| `Navbar` | `<nav aria-label="Principal">`, `aria-current="page"` por rota ativa, contagem de filmes no `aria-label` do link Watchlist, `aria-label` do toggle de tema por modo (`"Ativar modo escuro"` / `"claro"`), `aria-label="Sair da conta"`, ícones decorativos `aria-hidden="true"` |
+
 ---
 
 ### Segurança

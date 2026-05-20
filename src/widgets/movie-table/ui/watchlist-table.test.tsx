@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import { renderWithProviders } from '@/test/test-utils'
+import { axe } from '@/test/setup'
 import { WatchlistTable } from './watchlist-table'
 import type { WatchlistMovie } from '@/features/watchlist'
 
@@ -111,5 +112,81 @@ describe('WatchlistTable', () => {
     const rows = screen.getAllByRole('row').slice(1)
     expect(within(rows[0]!).getAllByText(/filme l/i)[0]).toBeInTheDocument()
     expect(within(rows[2]!).getAllByText(/filme 18/i)[0]).toBeInTheDocument()
+  })
+})
+
+describe('WatchlistTable — acessibilidade', () => {
+  const onRemove = vi.fn()
+
+  it('não tem violações de acessibilidade com filmes', async () => {
+    const { container } = renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('não tem violações de acessibilidade no estado vazio', async () => {
+    const { container } = renderWithProviders(<WatchlistTable movies={[]} onRemove={onRemove} />)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+
+  it('não tem violações de acessibilidade com dialog de confirmação aberto', async () => {
+    const { container } = renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    const removeButtons = screen.getAllByRole('button', { name: /remover .+ da lista/i })
+    await userEvent.click(removeButtons[0]!)
+    expect(await axe(container)).toHaveNoViolations()
+  })
+})
+
+describe('WatchlistTable — aria-sort', () => {
+  const onRemove = vi.fn()
+
+  it('colunas ordenáveis têm aria-sort="none" no estado inicial', () => {
+    renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    const table = screen.getByRole('table', { name: /watchlist de filmes/i })
+    const sortableHeaders = within(table).getAllByRole('columnheader').filter((th) => th.hasAttribute('aria-sort'))
+    expect(sortableHeaders.length).toBeGreaterThan(0)
+    sortableHeaders.forEach((th) => expect(th).toHaveAttribute('aria-sort', 'none'))
+  })
+
+  it('coluna Ações não tem aria-sort', () => {
+    renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    const table = screen.getByRole('table', { name: /watchlist de filmes/i })
+    const acoesTh = within(table).getByRole('columnheader', { name: 'Ações' })
+    expect(acoesTh).not.toHaveAttribute('aria-sort')
+  })
+
+  it('aria-sort passa para ascending ao ordenar crescente', async () => {
+    renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    await userEvent.click(screen.getByRole('button', { name: /rating/i }))
+    const ratingTh = screen.getByRole('button', { name: /rating/i }).closest('th')!
+    expect(ratingTh).toHaveAttribute('aria-sort', 'ascending')
+  })
+
+  it('aria-sort passa para descending ao ordenar decrescente', async () => {
+    renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    await userEvent.click(screen.getByRole('button', { name: /rating/i }))
+    await userEvent.click(screen.getByRole('button', { name: /rating/i }))
+    expect(screen.getByRole('button', { name: /rating/i }).closest('th')!).toHaveAttribute('aria-sort', 'descending')
+  })
+})
+
+describe('WatchlistTable — rating acessível', () => {
+  const onRemove = vi.fn()
+
+  it('ícone ★ na célula de rating é aria-hidden', () => {
+    const { container } = renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    const stars = container.querySelectorAll('[aria-hidden="true"]')
+    expect(stars.length).toBeGreaterThan(0)
+  })
+
+  it('texto "Avaliação:" está presente para leitores de tela', () => {
+    const { container } = renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    const srOnlyEls = container.querySelectorAll('.sr-only')
+    const hasAvaliacao = Array.from(srOnlyEls).some((el) => el.textContent?.includes('Avaliação:'))
+    expect(hasAvaliacao).toBe(true)
+  })
+
+  it('botão remover tem aria-label com título do filme', () => {
+    renderWithProviders(<WatchlistTable movies={MOVIES} onRemove={onRemove} />)
+    expect(screen.getAllByRole('button', { name: /remover duna da lista/i })[0]).toBeInTheDocument()
   })
 })
