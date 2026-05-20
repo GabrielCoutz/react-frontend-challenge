@@ -31,7 +31,7 @@ src/
 
   entities/
     movie/api/    # hooks TanStack Query por endpoint
-    user/model/   # useAuthStore (Zustand + persist)
+    user/model/   # useAuthStore (Zustand, sem persist — re-hidratado pelo guard)
 
   shared/
     api/          # tmdbClient (axios + Bearer), tmdbApi, tipos
@@ -68,7 +68,7 @@ O TanStack Router protege rotas via `beforeLoad` assíncrono no layout route `_a
 
 ### Performance
 
-Cada página é carregada sob demanda via `lazyRouteComponent` — a API nativa do TanStack Router, que além do code splitting expõe `.preload()` para prefetch ao hover em links e trata reload automático quando hashes de chunk mudam após deploy. Durante o carregamento, a navbar permanece visível e o conteúdo exibe skeleton — sem salto de layout.
+Cada página é carregada sob demanda via `lazyRouteComponent` — a API nativa do TanStack Router, que além do code splitting trata reload automático quando hashes de chunk mudam após deploy. Durante o carregamento, a navbar permanece visível e o conteúdo exibe skeleton — sem salto de layout.
 
 ---
 
@@ -87,7 +87,7 @@ Senha: `3rvv4R\T&I{2nb'j+fIL,MUYF[^7G(0n`
 Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar, adicionar à lista, repetir. Interfaces que dependem exclusivamente do mouse introduzem fricção real no workflow e excluem usuários com deficiência motora ou visual. Por isso o projeto foi construído com conformidade WCAG 2.1 nível AAA e WAI-ARIA desde o início:
 
 - **Navegação por teclado completa** com skip-nav link e landmarks semânticos (`<main>`, `<nav aria-label>`, `<aside>`, `<section>`)
-- **Formulário de login** com `aria-invalid`, `aria-describedby` em erros e `autoComplete` correto — compatível com gerenciadores de senha e leitores de tela
+- **Formulário de login** com `aria-invalid`, `aria-describedby` em erros, `aria-label="Mostrar senha"` / `"Ocultar senha"` no toggle de senha e `autoComplete` correto — compatível com gerenciadores de senha e leitores de tela
 - **Grid de filmes** com `aria-live="polite"` — transições de loading/empty/error anunciadas sem interromper o fluxo de leitura
 - **Tabela da watchlist** com `aria-sort` nas colunas ordenáveis; mobile usa `<ul>/<li>` semânticos
 - **Botões com contexto completo** — `aria-label="Adicionar Inception à watchlist"` em vez de `"Adicionar"`, eliminando ambiguidade para leitores de tela
@@ -100,7 +100,7 @@ Cada atributo ARIA documentado acima tem cobertura de teste dedicada — qualque
 
 | Componente | Atributos/comportamentos cobertos |
 |---|---|
-| `LoginForm` | `aria-invalid` por campo, `aria-describedby` apontando para `id` do alerta, `role="alert"` nos erros, `autoComplete` nos inputs, `aria-label` dinâmico do toggle de senha (`"Mostrar"` / `"Ocultar"`), `aria-busy` no submit |
+| `LoginForm` | `aria-invalid` por campo, `aria-describedby` apontando para `id` do alerta, `role="alert"` nos erros, `autoComplete` nos inputs, `aria-label` dinâmico do toggle de senha (`"Mostrar senha"` / `"Ocultar senha"`), `aria-busy` no submit |
 | `WatchlistTable` | `aria-sort="none/ascending/descending"` nas colunas ordenáveis, ausência de `aria-sort` em colunas não ordenáveis, ★ `aria-hidden="true"`, `sr-only "Avaliação:"`, `aria-label` contextual nos botões de remoção |
 | `MovieGrid` | `aria-live="polite"` no container, `aria-busy` refletindo estado de loading, `aria-label="Carregando filmes"` na lista skeleton, `role="alert"` no estado de erro, `role="status"` no estado vazio, `aria-label="{n} filmes"` na lista populada |
 | `MovieCard` | `aria-label="Ver detalhes de {título}"` no link, `aria-label` e `aria-pressed` do botão watchlist refletindo estado (`"Adicionar"` / `"Remover"` com título), overlay decorativo `aria-hidden="true"`, texto `sr-only` para rating |
