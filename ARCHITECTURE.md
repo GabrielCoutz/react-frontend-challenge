@@ -2,11 +2,7 @@
 
 ## Estrutura de pastas
 
-Feature-Sliced Design (FSD) — camadas superiores só importam de inferiores:
-
-```
-app > pages > widgets > features > entities > shared
-```
+Feature-Sliced Design (FSD)
 
 ```
 src/
@@ -72,9 +68,11 @@ Cada página é carregada sob demanda via `lazyRouteComponent` — a API nativa 
 
 ### Design de referência (Figma)
 
-O projeto conta com um arquivo Figma documentando o style guide, tokens de cor e as principais telas. Ele funciona como **referência visual** — hover, focus, loading states e breakpoints intermediários estão definidos no código, não no Figma, pois são comportamentos de interação que ferramentas de design não capturam bem.
+O projeto conta com um arquivo Figma documentando o style guide, tokens de cor e as principais telas. Ele funciona como **referência visual**.
 
-[CineDash — UI Design](https://www.figma.com/design/x6EvQ28RvxVA1bBx8UFD7D/CineDash-%E2%80%94-UI-Design)
+[CineDash — UI Design](https://www.figma.com/design/x6EvQ28RvxVA1bBx8UFD7D/CineDash-%E2%80%94-UI-Design?m=auto&t=c8qy30SlAx1bJWym-1)
+
+Senha: `3rvv4R\T&I{2nb'j+fIL,MUYF[^7G(0n`
 
 ---
 
@@ -87,14 +85,7 @@ Ferramentas de curadoria são usadas em ciclos repetitivos — navegar, filtrar,
 - **Grid de filmes** com `aria-live="polite"` — transições de loading/empty/error anunciadas sem interromper o fluxo de leitura
 - **Tabela da watchlist** com `aria-sort` nas colunas ordenáveis; mobile usa `<ul>/<li>` semânticos
 - **Botões com contexto completo** — `aria-label="Adicionar Inception à watchlist"` em vez de `"Adicionar"`, eliminando ambiguidade para leitores de tela
-- **Paleta verificada contra WCAG 2.1 SC 1.4.6 (Contrast Enhanced, Level AAA):**
-
-| Token            | Dark     | Light    |
-| ---------------- | -------- | -------- |
-| Texto principal  | 19:1 ✅  | 20:1 ✅  |
-| Texto secundário | 7.0:1 ✅ | 7.0:1 ✅ |
-| Primary (ações)  | 5.9:1 ✅ | 7.6:1 ✅ |
-| Bordas / UI      | 3.3:1 ✅ | 3.2:1 ✅ |
+- **Paleta verificada contra WCAG 2.1 SC 1.4.6 (Contrast Enhanced, Level AAA)**
 
 ---
 
@@ -104,7 +95,7 @@ SPAs têm uma superfície de ataque específica que raramente aparece em checkli
 
 **Tokens e credenciais**
 
-- Autenticação usa `crypto.randomUUID()` — 122 bits de entropia, não previsível (mesmo sendo fake)
+- Autenticação usa `crypto.randomUUID()` — mesmo sendo fake
 - Credencial da API TMDB trafega exclusivamente via `Authorization: Bearer` header.
 
 **Política de conteúdo**
@@ -114,10 +105,10 @@ SPAs têm uma superfície de ataque específica que raramente aparece em checkli
 
 **Validação de dados externos**
 
-- Chave de vídeo da API TMDB validada contra `/^[A-Za-z0-9_-]{11}$/` antes de compor URL de iframe; iframe do YouTube com atributo `sandbox` explícito
+- Chave de vídeo da API TMDB validada `/^[A-Za-z0-9_-]{11}$/` antes de compor URL; iframe do YouTube com atributo `sandbox` explícito
 - Parâmetros de URL (`personName`, `sort_by`, `id`) validados com tipos estritos e allowlists — strings arbitrárias são descartadas antes de chegar à API
 - Leitura do `localStorage` no boot envolta em `try/catch` com allowlist de valores válidos — JSON corrompido não trava a aplicação
 
 **Ferramentas**
 
-- `eslint-plugin-security` no pipeline de lint — padrões inseguros são flagados em tempo de desenvolvimento
+- [eslint-plugin-security](https://github.com/eslint-community/eslint-plugin-security) no pipeline de lint — padrões inseguros são flagados em tempo de desenvolvimento
