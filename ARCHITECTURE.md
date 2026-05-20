@@ -44,7 +44,9 @@ src/
 
 ## Autenticação sem backend
 
-Login valida email + senha via Zod. Ao autenticar, `generateAuthToken()` gera um UUID via `crypto.randomUUID()` e o Zustand `persist` salva `{ token, isAuthenticated }` em `localStorage` (`auth-storage`).
+Login valida email + senha via Zod. Ao autenticar, `generateAuthToken()` gera um UUID e o Zustand `persist` salva `{ token, isAuthenticated }` em `localStorage` (`auth-storage`).
+
+`crypto.randomUUID()` só está disponível em **secure contexts** (HTTPS ou `localhost`) — restrição de spec W3C, não do build. Em HTTP puro (ex: preview sem TLS) o campo é `undefined` e o login quebra. Por isso `generateAuthToken` usa `crypto.randomUUID` quando disponível e cai num gerador UUID v4 manual (`Math.random`) como fallback.
 
 O TanStack Router protege rotas via `beforeLoad` no layout route `_authenticated` (pathless). Se `isAuthenticated` for falso, redireciona para `/`. A sessão sobrevive ao reload porque o store é reidratado do `localStorage` antes do React montar.
 
