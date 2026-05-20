@@ -62,11 +62,17 @@ async function verifySignature(
   }
 }
 
+const hasCryptoSubtle = typeof crypto !== "undefined" && !!crypto.subtle;
+
 export async function setSignedAuthToken(token: string): Promise<void> {
-  const sig = await signValue(token);
   const secure = isSecure ? "; Secure" : "";
-  // base64url uses only A-Za-z0-9-_ — safe for cookie values without encoding
-  document.cookie = `${COOKIE_NAME}=${token}.${sig}; max-age=${MAX_AGE}; path=/; SameSite=Strict${secure}`;
+  if (hasCryptoSubtle) {
+    const sig = await signValue(token);
+    // base64url uses only A-Za-z0-9-_ — safe for cookie values without encoding
+    document.cookie = `${COOKIE_NAME}=${token}.${sig}; max-age=${MAX_AGE}; path=/; SameSite=Strict${secure}`;
+  } else {
+    document.cookie = `${COOKIE_NAME}=${token}; max-age=${MAX_AGE}; path=/; SameSite=Strict${secure}`;
+  }
 }
 
 export async function getSignedAuthToken(): Promise<string | null> {
@@ -76,11 +82,13 @@ export async function getSignedAuthToken(): Promise<string | null> {
   if (!match) return null;
 
   const raw = match[1];
-  if (!raw || !raw.includes(".")) return null;
+  if (!raw) return null;
+
+  if (!hasCryptoSubtle) return raw;
+
+  if (!raw.includes(".")) return null;
 
   const lastDot = raw.lastIndexOf(".");
-  if (lastDot === -1) return null;
-
   const value = raw.slice(0, lastDot);
   const sig = raw.slice(lastDot + 1);
 
