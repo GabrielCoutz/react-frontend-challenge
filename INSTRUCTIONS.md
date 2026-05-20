@@ -62,7 +62,5 @@ npm run preview      # http://localhost:4173
 ## Testes
 
 ```bash
-npm test             # todos os testes
-npm run test:ui      # interface visual
-npm run coverage     # cobertura
+npm test
 ```
