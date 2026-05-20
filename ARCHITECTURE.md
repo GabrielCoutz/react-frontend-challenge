@@ -44,11 +44,11 @@ src/
 
 ## Autenticação sem backend
 
-Login valida email + senha via Zod. Ao autenticar, `generateAuthToken()` gera um UUID e o Zustand `persist` salva `{ token, isAuthenticated }` em `localStorage` (`auth-storage`).
+Login valida email + senha via Zod. Ao autenticar, `generateAuthToken()` gera um UUID e o Zustand `persist` salva `{ token, isAuthenticated }` em cookie (`auth-storage`) via `cookieStorage` — um adapter `StateStorage` customizado com `SameSite=Strict`, `Secure` (apenas em HTTPS) e `max-age` de 7 dias.
 
 `crypto.randomUUID()` só está disponível em **secure contexts** (HTTPS ou `localhost`) — restrição de spec W3C, não do build. Em HTTP puro (ex: preview sem TLS) o campo é `undefined` e o login quebra. Por isso `generateAuthToken` usa `crypto.randomUUID` quando disponível e cai num gerador UUID v4 manual (`Math.random`) como fallback.
 
-O TanStack Router protege rotas via `beforeLoad` no layout route `_authenticated` (pathless). Se `isAuthenticated` for falso, redireciona para `/`. A sessão sobrevive ao reload porque o store é reidratado do `localStorage` antes do React montar.
+O TanStack Router protege rotas via `beforeLoad` no layout route `_authenticated` (pathless). Se `isAuthenticated` for falso, redireciona para `/`. A sessão sobrevive ao reload porque o store é reidratado do cookie antes do React montar.
 
 ---
 
@@ -98,6 +98,7 @@ SPAs têm uma superfície de ataque específica que raramente aparece em checkli
 **Tokens e credenciais**
 
 - Autenticação usa `crypto.randomUUID()` — mesmo sendo fake
+- Token de sessão armazenado em cookie com `SameSite=Strict` + `Secure` (HTTPS) — protege contra CSRF; `HttpOnly` não é aplicável em SPAs sem backend
 - Credencial da API TMDB trafega exclusivamente via `Authorization: Bearer` header.
 
 **Política de conteúdo**

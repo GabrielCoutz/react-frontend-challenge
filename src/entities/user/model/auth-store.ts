@@ -1,3 +1,4 @@
+import { cookieStorage } from "@/shared/utils/cookieStorage";
 import { generateAuthToken } from "@/shared/utils/generateAuthToken";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -31,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
+      storage: cookieStorage,
       partialize: (state) => ({ token: state.token, isAuthenticated: state.isAuthenticated }),
     },
   ),
